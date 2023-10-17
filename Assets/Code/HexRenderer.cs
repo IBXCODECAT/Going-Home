@@ -15,12 +15,12 @@ public class HexRenderer : MonoBehaviour
 
     [SerializeField] private Material material;
 
-    [SerializeField] private float innerSize;
-    [SerializeField] private float outerSize;
-    [SerializeField] private float height;
+    [SerializeField] internal float innerSize;
+    [SerializeField] internal float outerSize;
+    [SerializeField] internal float height;
 
     [Tooltip("Make top flat perpendicular to the positive Z forward axis")]
-    [SerializeField] private bool useFlatTop;
+    [SerializeField] internal bool useFlatTop;
 
     private void Awake()
     {
@@ -47,7 +47,12 @@ public class HexRenderer : MonoBehaviour
         }
     }
 
-    private void DrawMesh()
+    internal void SetMaterial(Material material)
+    {
+        this.material = material;
+    }
+
+    internal void DrawMesh()
     {
         DrawFaces();
         CombineFaces();
@@ -67,6 +72,21 @@ public class HexRenderer : MonoBehaviour
         for(int point = 0; point < 6; point++)
         {
             m_faces.Add(CreateFace(innerSize, outerSize, -height / 2f, -height / 2f, point, true));
+        }
+
+        //Outer Sides
+        for(int point = 0; point < 6; point++)
+        {
+            m_faces.Add(CreateFace(outerSize, outerSize, height / 2f, -height / 2f, point, true));
+        }
+
+        //Only draw inner sides if radius is greater than zero
+        if(innerSize >= 0)
+        {
+            for(int point = 0; point < 6; point++)
+            {
+                m_faces.Add(CreateFace(innerSize, innerSize, height / 2f, -height / 2f, point, false));
+            }
         }
     }
 
