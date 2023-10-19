@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Xml.Serialization;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
@@ -15,38 +15,116 @@ namespace Hexoidra
 {
     internal class Game : GameWindow
     {
-
-        float[] verticies =
+        List<Vector3> verticies = new List<Vector3>()
         {
-            -0.5f, 0.5f, 0f, //top left vertex - 0
-            0.5f, 0.5f, 0f, // top right vertex - 1
-            0.5f, -0.5f, 0f, //bottom right vertex - 2
-            -0.5f, -0.5f, 0f //botom left vertex -3
+            // Front face
+            new Vector3(-0.5f, 0.5f, -0.5f), // Top left vertex
+            new Vector3(0.5f, 0.5f, -0.5f),  // Top right vertex
+            new Vector3(0.5f, -0.5f, -0.5f), // Bottom right vertex
+            new Vector3(-0.5f, -0.5f, -0.5f), // Bottom left vertex
+
+            // Back face
+            new Vector3(-0.5f, 0.5f, 0.5f),  // Top left vertex
+            new Vector3(0.5f, 0.5f, 0.5f),   // Top right vertex
+            new Vector3(0.5f, -0.5f, 0.5f),  // Bottom right vertex
+            new Vector3(-0.5f, -0.5f, 0.5f),  // Bottom left vertex
+
+            // Left face
+            new Vector3(-0.5f, 0.5f, 0.5f),  // Top left vertex
+            new Vector3(-0.5f, 0.5f, -0.5f), // Top right vertex
+            new Vector3(-0.5f, -0.5f, -0.5f), // Bottom right vertex
+            new Vector3(-0.5f, -0.5f, 0.5f),  // Bottom left vertex
+
+            // Right face
+            new Vector3(0.5f, 0.5f, 0.5f),   // Top left vertex
+            new Vector3(0.5f, 0.5f, -0.5f),  // Top right vertex
+            new Vector3(0.5f, -0.5f, -0.5f), // Bottom right vertex
+            new Vector3(0.5f, -0.5f, 0.5f),   // Bottom left vertex
+
+            // Top face
+            new Vector3(-0.5f, 0.5f, 0.5f),  // Top left vertex
+            new Vector3(0.5f, 0.5f, 0.5f),   // Top right vertex
+            new Vector3(0.5f, 0.5f, -0.5f),  // Bottom right vertex
+            new Vector3(-0.5f, 0.5f, -0.5f),  // Bottom left vertex
+
+            // Bottom face
+            new Vector3(-0.5f, -0.5f, 0.5f),  // Top left vertex
+            new Vector3(0.5f, -0.5f, 0.5f),   // Top right vertex
+            new Vector3(0.5f, -0.5f, -0.5f),  // Bottom right vertex
+            new Vector3(-0.5f, -0.5f, -0.5f),  // Bottom left vertex
         };
 
-        float[] texCoords =
+        List<Vector2> texCoords = new List<Vector2>()
         {
-            0f, 1f, //top-left
-            1f, 1f, //top-right
-            1f, 0f, //bottom-right
-            0f, 0f //bottom-left
+            //Face 0
+            new Vector2(0f, 1f), //top left uv
+            new Vector2(1f, 1f), //top right uv
+            new Vector2(1f, 0f), //bottom right uv
+            new Vector2(0f, 0f), //bottom left uv
+
+            //Face 1
+            new Vector2(0f, 1f), //top left uv
+            new Vector2(1f, 1f), //top right uv
+            new Vector2(1f, 0f), //bottom right uv
+            new Vector2(0f, 0f), //bottom left uv
+
+            //Face 2
+            new Vector2(0f, 1f), //top left uv
+            new Vector2(1f, 1f), //top right uv
+            new Vector2(1f, 0f), //bottom right uv
+            new Vector2(0f, 0f), //bottom left uv
+
+            //Face 3
+            new Vector2(0f, 1f), //top left uv
+            new Vector2(1f, 1f), //top right uv
+            new Vector2(1f, 0f), //bottom right uv
+            new Vector2(0f, 0f), //bottom left uv
+
+            //Face 4
+            new Vector2(0f, 1f), //top left uv
+            new Vector2(1f, 1f), //top right uv
+            new Vector2(1f, 0f), //bottom right uv
+            new Vector2(0f, 0f), //bottom left uv
+
+            //Face 5
+            new Vector2(0f, 1f), //top left uv
+            new Vector2(1f, 1f), //top right uv
+            new Vector2(1f, 0f), //bottom right uv
+            new Vector2(0f, 0f), //bottom left uv
         };
 
         uint[] indicies =
         {
-            //top triangle
+            //first face
             0, 1, 2,
-            //bottom triangle
-            2, 3, 0
+            2, 3, 0,
+
+            4, 5, 6,
+            6, 7, 4,
+
+            8, 9, 10,
+            10, 11, 8,
+
+            12, 13, 14,
+            14, 15, 12,
+
+            16, 17, 18,
+            18, 18, 16,
+
+            20, 21, 22,
+            22, 23, 20
         };
 
         //Render pipeline vars
         int vao;
-        int shaderProgram;
+        int defaultShaderProgram;
         int vbo;
         int ebo;
         int textureID;
         int textureVbo;
+
+        //transformation vars
+        float yRot = 0f;
 
         private int width;
         private int height;
@@ -88,8 +166,8 @@ namespace Hexoidra
             //put data in the vbo
             GL.BufferData(
                 BufferTarget.ArrayBuffer,
-                verticies.Length * sizeof(float),
-                verticies,
+                verticies.Count * Vector3.SizeInBytes,
+                verticies.ToArray(),
                 BufferUsageHint.StaticDraw
             );
 
@@ -109,11 +187,11 @@ namespace Hexoidra
             //store the data in the vbo
             GL.BufferData(
                 BufferTarget.ArrayBuffer,
-                texCoords.Length * sizeof(float),
-                texCoords,
+                texCoords.Count * Vector2.SizeInBytes,
+                texCoords.ToArray(),
                 BufferUsageHint.StaticDraw
             );
-            
+
             //point slot (1) of the VAO to our texture vbo and enable the slot
             GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
             GL.EnableVertexArrayAttrib(vao, 1);
@@ -136,7 +214,7 @@ namespace Hexoidra
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create the shader program
-            shaderProgram = GL.CreateProgram();
+            defaultShaderProgram = GL.CreateProgram();
 
             int vertexShader = GL.CreateShader(ShaderType.VertexShader);
             GL.ShaderSource(vertexShader, LoadShaderSource("default.vert"));
@@ -146,10 +224,10 @@ namespace Hexoidra
             GL.ShaderSource(fragmentShader, LoadShaderSource("default.frag"));
             GL.CompileShader(fragmentShader);
 
-            GL.AttachShader(shaderProgram, vertexShader);
-            GL.AttachShader(shaderProgram, fragmentShader);
+            GL.AttachShader(defaultShaderProgram, vertexShader);
+            GL.AttachShader(defaultShaderProgram, fragmentShader);
 
-            GL.LinkProgram(shaderProgram);
+            GL.LinkProgram(defaultShaderProgram);
 
             //Delete the shaders
             GL.DeleteShader(vertexShader);
@@ -188,6 +266,9 @@ namespace Hexoidra
 
             //unbind texture
             GL.BindTexture(TextureTarget.Texture2D, 0);
+
+            //Enable Depth Tests (Render closer objects on top of others)
+            GL.Enable(EnableCap.DepthTest);
         }
 
         protected override void OnUnload()
@@ -197,7 +278,7 @@ namespace Hexoidra
             GL.DeleteBuffer(vbo);
             GL.DeleteVertexArray(vao);
             GL.DeleteBuffer(ebo);
-            GL.DeleteProgram(shaderProgram);
+            GL.DeleteProgram(defaultShaderProgram);
 
             GL.DeleteTexture(textureID);
         }
@@ -205,15 +286,44 @@ namespace Hexoidra
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             GL.ClearColor(0.6f, 0.3f, 1f, 1f);
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             //Draw triangle
-            GL.UseProgram(shaderProgram);
+            GL.UseProgram(defaultShaderProgram);
 
             GL.BindTexture(TextureTarget.Texture2D, textureID);
 
             GL.BindVertexArray(vao);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
+
+
+
+            // transformation matricies
+            Matrix4 model = Matrix4.Identity;
+            Matrix4 view = Matrix4.Identity;
+
+            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(
+                MathHelper.DegreesToRadians(60.0f), //FOV
+                width / height, //Aspect Ratio
+                0.1f, //Near Clipping plane
+                100.0f //Far Clipping plane
+            );
+
+            model = Matrix4.CreateRotationY(yRot);
+            yRot += 0.001f;
+
+            Matrix4 translation = Matrix4.CreateTranslation(0f, 0f, -3f);
+
+            model *= translation;
+
+            int modelLocation = GL.GetUniformLocation(defaultShaderProgram, "model");
+            int viewLocation = GL.GetUniformLocation(defaultShaderProgram, "view");
+            int projectionLocation = GL.GetUniformLocation(defaultShaderProgram, "projection");
+
+            GL.UniformMatrix4(modelLocation, true, ref model);
+            GL.UniformMatrix4(viewLocation, true, ref view);
+            GL.UniformMatrix4(projectionLocation, true, ref projection);
+
             GL.DrawElements(PrimitiveType.Triangles, indicies.Length, DrawElementsType.UnsignedInt, 0);
 
             //GL.DrawArrays(PrimitiveType.Triangles, 0, 4);
