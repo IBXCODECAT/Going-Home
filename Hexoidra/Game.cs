@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Hexoidra.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
@@ -95,10 +96,12 @@ namespace Hexoidra
             new Vector2(0f, 0f), //bottom left uv
         };
 
-        uint[] indices =
+        List<uint> indices = new List<uint>()
         {
-            //first face
+            // first face
+            // top triangle
             0, 1, 2,
+            // bottom triangle
             2, 3, 0,
 
             4, 5, 6,
@@ -111,19 +114,18 @@ namespace Hexoidra
             14, 15, 12,
 
             16, 17, 18,
-            18, 18, 16,
+            18, 19, 16,
 
             20, 21, 22,
             22, 23, 20
         };
 
         //Render pipeline vars
-        int vao;
-        int defaultShaderProgram;
-        int vbo;
-        int ebo;
-        int textureID;
-        int textureVbo;
+        VertexArrayObject vao;
+        IndexBufferObject ibo;
+        Shader shader;
+        Texture texture;
+
 
         //transformation vars
         float yRot = 0f;
@@ -155,119 +157,18 @@ namespace Hexoidra
         {
             base.OnLoad();
 
-            //Create and bind the vao to the current OpenGL Context
-            vao = GL.GenVertexArray();
-            GL.BindVertexArray(vao);
+            vao = new VertexArrayObject();
 
-            //====================VERTEX VBO====================//
+            VertexBufferObject vbo = new VertexBufferObject(vertices);
+            vao.LinkVertexBufferObject(0, 3, vbo);
 
-            //generate and bind the vbo buffer
-            vbo = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+            VertexBufferObject uvVBO = new VertexBufferObject(texCoords);
+            vao.LinkVertexBufferObject(1, 2, uvVBO);
 
-            //put data in the vbo
-            GL.BufferData(
-                BufferTarget.ArrayBuffer,
-                vertices.Count * Vector3.SizeInBytes,
-                vertices.ToArray(),
-                BufferUsageHint.StaticDraw
-            );
+            ibo = new IndexBufferObject(indices);
 
-            //point slot (0) of the VAO to the currently bound VBO (vbo) and enable the slot
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
-            GL.EnableVertexArrayAttrib(vao, 0);
-
-            //unbind the vbo
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-
-            //====================TEXTURES VBO====================//
-
-            //generate a buffer and bind the buffer
-            textureVbo = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, textureVbo);
-
-            //store the data in the vbo
-            GL.BufferData(
-                BufferTarget.ArrayBuffer,
-                texCoords.Count * Vector2.SizeInBytes,
-                texCoords.ToArray(),
-                BufferUsageHint.StaticDraw
-            );
-
-            //point slot (1) of the VAO to our texture vbo and enable the slot
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
-            GL.EnableVertexArrayAttrib(vao, 1);
-
-            //unbind the vbo
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-
-
-            //====================MORE STUFF====================//
-
-            //unbind the vao and vbo respectively
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindVertexArray(0);
-
-
-            //EBO Buffer
-            ebo = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-
-            //Create the shader program
-            defaultShaderProgram = GL.CreateProgram();
-
-            int vertexShader = GL.CreateShader(ShaderType.VertexShader);
-            GL.ShaderSource(vertexShader, LoadShaderSource("default.vert"));
-            GL.CompileShader(vertexShader);
-
-            int fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-            GL.ShaderSource(fragmentShader, LoadShaderSource("default.frag"));
-            GL.CompileShader(fragmentShader);
-
-            GL.AttachShader(defaultShaderProgram, vertexShader);
-            GL.AttachShader(defaultShaderProgram, fragmentShader);
-
-            GL.LinkProgram(defaultShaderProgram);
-
-            //Delete the shaders
-            GL.DeleteShader(vertexShader);
-            GL.DeleteShader(fragmentShader);
-
-            //============Load Textures============
-
-            textureID = GL.GenTexture();
-            //Activate the fist texture in the unit
-            GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, textureID);
-
-            //Texture params
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-
-            //mipmap params - does not use bluring due to pixelated vibes
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-
-            //load image
-            StbImage.stbi_set_flip_vertically_on_load(1); //StbImage reads in opisisate direction to opengl by default
-            ImageResult coolTexture = ImageResult.FromStream(File.OpenRead("../../../Textures/tex.png"), ColorComponents.RedGreenBlueAlpha);
-
-            //Give openGL texture data
-            GL.TexImage2D(
-                TextureTarget.Texture2D,
-                0, PixelInternalFormat.Rgba,
-                coolTexture.Width,
-                coolTexture.Height,
-                0,
-                PixelFormat.Rgba,
-                PixelType.UnsignedByte,
-                coolTexture.Data
-            );
-
-            //unbind texture
-            GL.BindTexture(TextureTarget.Texture2D, 0);
+            shader = new Shader("default.vert", "default.frag");
+            texture = new Texture("tex.png");
 
             //Enable Depth Tests (Render closer objects on top of others)
             GL.Enable(EnableCap.DepthTest);
@@ -281,12 +182,10 @@ namespace Hexoidra
         {
             base.OnUnload();
 
-            GL.DeleteBuffer(vbo);
-            GL.DeleteVertexArray(vao);
-            GL.DeleteBuffer(ebo);
-            GL.DeleteProgram(defaultShaderProgram);
-
-            GL.DeleteTexture(textureID);
+            vao.Dispose();
+            ibo.Dispose();
+            texture.Dispose();
+            shader.Dispose();
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -294,15 +193,10 @@ namespace Hexoidra
             GL.ClearColor(0.6f, 0.3f, 1f, 1f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            //Draw triangle
-            GL.UseProgram(defaultShaderProgram);
-
-            GL.BindTexture(TextureTarget.Texture2D, textureID);
-
-            GL.BindVertexArray(vao);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
-
-
+            shader.Bind();
+            vao.Bind();
+            ibo.Bind();
+            texture.Bind();
 
             // transformation matricies
             Matrix4 model = Matrix4.Identity;
@@ -316,17 +210,17 @@ namespace Hexoidra
 
             model *= translation;
 
-            int modelLocation = GL.GetUniformLocation(defaultShaderProgram, "model");
-            int viewLocation = GL.GetUniformLocation(defaultShaderProgram, "view");
-            int projectionLocation = GL.GetUniformLocation(defaultShaderProgram, "projection");
+            int modelLocation = GL.GetUniformLocation(shader.ID, "model");
+            int viewLocation = GL.GetUniformLocation(shader.ID, "view");
+            int projectionLocation = GL.GetUniformLocation(shader.ID, "projection");
 
             GL.UniformMatrix4(modelLocation, true, ref model);
             GL.UniformMatrix4(viewLocation, true, ref view);
             GL.UniformMatrix4(projectionLocation, true, ref projection);
 
-            GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(PrimitiveType.Triangles, indices.Count, DrawElementsType.UnsignedInt, 0);
 
-            //GL.DrawArrays(PrimitiveType.Triangles, 0, 4);
+            
 
             Context.SwapBuffers();
 
@@ -341,31 +235,6 @@ namespace Hexoidra
             KeyboardState keyboardInput = KeyboardState;
 
             camera.Update(keyboardInput, mouseInput, args);
-        }
-
-        /// <summary>
-        /// Method to load a shader file and return it's contents as a string
-        /// </summary>
-        /// <param name="filePath">The path of the file</param>
-        /// <returns>Contents of the file as a string</returns>
-        public static string LoadShaderSource(string filePath)
-        {
-            string shaderSource = "";
-
-            try
-            {
-                using (StreamReader sr = new StreamReader("../../../Shaders/" + filePath))
-                {
-                    shaderSource = sr.ReadToEnd();
-                }
-                //Console.WriteLine(shaderSource);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Failed to load shader source file: " + ex.Message);
-            }
-
-            return shaderSource;
         }
     }
 }
