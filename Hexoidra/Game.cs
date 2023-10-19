@@ -274,6 +274,7 @@ namespace Hexoidra
 
 
             camera = new Camera(width, height, Vector3.Zero);
+            CursorState = CursorState.Grabbed;
         }
 
         protected override void OnUnload()

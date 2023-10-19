@@ -5,7 +5,7 @@ namespace Hexoidra
     {
         private static void Main(String[] args)
         {
-            using(Game game = new Game(500, 500))
+            using(Game game = new Game(1920, 1080))
             {
                 game.Run();
             }
