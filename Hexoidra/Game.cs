@@ -15,7 +15,7 @@ namespace Hexoidra
 {
     internal class Game : GameWindow
     {
-        List<Vector3> verticies = new List<Vector3>()
+        List<Vector3> vertices = new List<Vector3>()
         {
             // Front face
             new Vector3(-0.5f, 0.5f, -0.5f), // Top left vertex
@@ -93,7 +93,7 @@ namespace Hexoidra
             new Vector2(0f, 0f), //bottom left uv
         };
 
-        uint[] indicies =
+        uint[] indices =
         {
             //first face
             0, 1, 2,
@@ -166,8 +166,8 @@ namespace Hexoidra
             //put data in the vbo
             GL.BufferData(
                 BufferTarget.ArrayBuffer,
-                verticies.Count * Vector3.SizeInBytes,
-                verticies.ToArray(),
+                vertices.Count * Vector3.SizeInBytes,
+                vertices.ToArray(),
                 BufferUsageHint.StaticDraw
             );
 
@@ -210,7 +210,7 @@ namespace Hexoidra
             //EBO Buffer
             ebo = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, indicies.Length * sizeof(uint), indicies, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             //Create the shader program
@@ -324,7 +324,7 @@ namespace Hexoidra
             GL.UniformMatrix4(viewLocation, true, ref view);
             GL.UniformMatrix4(projectionLocation, true, ref projection);
 
-            GL.DrawElements(PrimitiveType.Triangles, indicies.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
 
             //GL.DrawArrays(PrimitiveType.Triangles, 0, 4);
 
