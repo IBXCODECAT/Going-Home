@@ -39,13 +39,13 @@ public class HexRenderer : MonoBehaviour
         this.material = material;
     }
 
-    internal void DrawMesh(HexFaceBooleans hexExposure)
+    internal void DrawMesh(HexMeshFacesBooleans hexExposure)
     {
         DrawFaces(hexExposure);
         CombineFaces();
     }
 
-    private void DrawFaces(HexFaceBooleans exposure)
+    private void DrawFaces(HexMeshFacesBooleans exposure)
     {
         m_faces = new List<HexMeshFace>();
 
