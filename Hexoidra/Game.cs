@@ -17,14 +17,25 @@ namespace Hexoidra
 
         float[] verticies =
         {
-            0f, 0.5f, 0f, //top vertex
-            -0.5f, -0.5f, 0f, //bottom left
-            0.5f, -0.5f, 0f //botom right
+            -0.5f, 0.5f, 0f, //top left vertex - 0
+            0.5f, 0.5f, 0f, // top right vertex - 1
+            0.5f, -0.5f, 0f, //bottom right vertex - 2
+            -0.5f, -0.5f, 0f //botom left vertex -3
+        };
+
+        uint[] indicies =
+        {
+            //top triangle
+            0, 1, 2,
+            //bottom triangle
+            2, 3, 0
         };
 
         //Render pipeline vars
         int vao;
         int shaderProgram;
+        int vbo;
+        int ebo;
 
         private int width;
         private int height;
@@ -70,6 +81,13 @@ namespace Hexoidra
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0); //unbinding the vbo
             GL.BindVertexArray(0); //Unbind the vao
 
+
+            //EBO Buffer
+            ebo = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, indicies.Length * sizeof(uint), indicies, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+
             //Create the shader program
             shaderProgram = GL.CreateProgram();
 
@@ -95,7 +113,9 @@ namespace Hexoidra
         {
             base.OnUnload();
 
+            GL.DeleteBuffer(vbo);
             GL.DeleteVertexArray(vao);
+            GL.DeleteBuffer(ebo);   
             GL.DeleteProgram(shaderProgram);
         }
 
@@ -107,7 +127,10 @@ namespace Hexoidra
             //Draw triangle
             GL.UseProgram(shaderProgram);
             GL.BindVertexArray(vao);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
+            GL.DrawElements(PrimitiveType.Triangles, indicies.Length, DrawElementsType.UnsignedInt, 0);
+            
+            //GL.DrawArrays(PrimitiveType.Triangles, 0, 4);
 
             Context.SwapBuffers();
 
