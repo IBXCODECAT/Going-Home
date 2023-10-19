@@ -8,13 +8,15 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
-
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using StbImageSharp;
 
 namespace Hexoidra
 {
     internal class Game : GameWindow
     {
+        Camera camera;
+
         List<Vector3> vertices = new List<Vector3>()
         {
             // Front face
@@ -269,6 +271,9 @@ namespace Hexoidra
 
             //Enable Depth Tests (Render closer objects on top of others)
             GL.Enable(EnableCap.DepthTest);
+
+
+            camera = new Camera(width, height, Vector3.Zero);
         }
 
         protected override void OnUnload()
@@ -300,14 +305,8 @@ namespace Hexoidra
 
             // transformation matricies
             Matrix4 model = Matrix4.Identity;
-            Matrix4 view = Matrix4.Identity;
-
-            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(
-                MathHelper.DegreesToRadians(60.0f), //FOV
-                width / height, //Aspect Ratio
-                0.1f, //Near Clipping plane
-                100.0f //Far Clipping plane
-            );
+            Matrix4 view = camera.GetViewMatrix();
+            Matrix4 projection = camera.GetProjectionMatrix();
 
             model = Matrix4.CreateRotationY(yRot);
             yRot += 0.001f;
@@ -336,6 +335,11 @@ namespace Hexoidra
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
             base.OnUpdateFrame(args);
+
+            MouseState mouseInput = MouseState;
+            KeyboardState keyboardInput = KeyboardState;
+
+            camera.Update(keyboardInput, mouseInput, args);
         }
 
         /// <summary>
