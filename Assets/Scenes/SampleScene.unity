@@ -391,7 +391,7 @@ GameObject:
   - component: {fileID: 613006943}
   - component: {fileID: 613006946}
   m_Layer: 0
-  m_Name: HEx
+  m_Name: Hex
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -476,8 +476,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridSize: {x: 15, y: 15}
   outerSize: 1
-  innerSize: 0.8
-  height: 0.1
+  innerSize: 0
+  height: 1
   isFlatTopped: 1
   material: {fileID: 2100000, guid: 964988ab079a045449f9280869c65926, type: 2}
 --- !u!1 &832575517
