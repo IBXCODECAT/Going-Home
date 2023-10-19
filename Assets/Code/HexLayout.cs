@@ -20,38 +20,66 @@ public class HexLayout : MonoBehaviour
         LayoutGrid();
     }
 
-    private void OnValidate()
-    {
-        if(Application.isPlaying)
-        {
-            LayoutGrid();
-        }
-    }
-
     private void LayoutGrid()
     {
-        for(int y = 0; y < gridSize.y; y++)
+        /*
+        for (int y = 0; y < gridSize.y; y++)
         {
-            for(int x = 0; x < gridSize.x; x++)
+            for (int x = 0; x < gridSize.x; x++)
             {
                 GameObject tile = new GameObject($"Hex {x}, {y}", typeof(HexRenderer));
                 tile.transform.position = GetPositionForHexFromCoordinate(new Vector2Int(x, y));
 
                 HexRenderer hr = tile.GetComponent<HexRenderer>();
+                hr.SetMaterial(material);
+
                 hr.useFlatTop = isFlatTopped;
                 hr.outerSize = outerSize;
                 hr.innerSize = innerSize;
-                hr.height= height;
+                hr.height = height;
 
-                hr.SetMaterial(material);
-                hr.DrawMesh();
+                HexFaceBooleans faceFilter = new HexFaceBooleans();
+
+                faceFilter.top = true;
+                faceFilter.bottom = true;
+
+                faceFilter.sides.side0 = false;
+                faceFilter.sides.side1 = false;
+                faceFilter.sides.side2 = false;
+                faceFilter.sides.side3 = false;
+                faceFilter.sides.side4 = false;
+                faceFilter.sides.side5 = false;
+
+                hr.DrawMesh(faceFilter);
 
                 tile.transform.SetParent(transform, true);
+            }
+        }*/
+
+        /*
+        for(int y = 0; y < gridSize.y; y++)
+        {
+            for(int x = 0; x < gridSize.x; x++)
+            {
+                GameObject tile = new GameObject($"Tile {x} {y}");
+                tile.transform.position = GetPositionForHexFromCoordinate2D(new Vector2Int(x, y));
+            }
+        }*/
+    }
+
+    private void OnDrawGizmos()
+    {
+        for (int y = 0; y < gridSize.y; y++)
+        {
+            for (int x = 0; x < gridSize.x; x++)
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawSphere(GetPositionForHexFromCoordinate2D(new Vector2Int(x, y), 0f), outerSize / 5f);
             }
         }
     }
 
-    private Vector3 GetPositionForHexFromCoordinate(Vector2Int coordinate)
+    private Vector3 GetPositionForHexFromCoordinate2D(Vector2Int coordinate, float worldYLevel)
     {
         int column = coordinate.x;
         int row = coordinate.y;
@@ -66,14 +94,14 @@ public class HexLayout : MonoBehaviour
         float offset;
         float size = outerSize;
 
-        if(!isFlatTopped)
+        if (!isFlatTopped)
         {
             shouldOffset = (row % 2) == 0;
             width = Mathf.Sqrt(3) * size;
             height = 2f * size;
 
             horizontalDistance = width;
-            verticalDistance = height * (3f/4f);
+            verticalDistance = height * (3f / 4f);
 
             offset = (shouldOffset) ? width / 2 : 0;
 
@@ -96,6 +124,6 @@ public class HexLayout : MonoBehaviour
 
         }
 
-        return new Vector3(xPosition, 0, -yPosition);
+        return new Vector3(xPosition, worldYLevel, -yPosition);
     }
 }

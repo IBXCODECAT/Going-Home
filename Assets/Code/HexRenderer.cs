@@ -34,50 +34,59 @@ public class HexRenderer : MonoBehaviour
         m_meshRenderer.material = material;
     }
 
-    private void OnEnable()
-    {
-        DrawMesh();
-    }
-
-    private void OnValidate()
-    {
-        if(Application.isPlaying)
-        {
-            DrawMesh();
-        }
-    }
-
     internal void SetMaterial(Material material)
     {
         this.material = material;
     }
 
-    internal void DrawMesh()
+    internal void DrawMesh(HexFaceBooleans hexExposure)
     {
-        DrawFaces();
+        DrawFaces(hexExposure);
         CombineFaces();
     }
 
-    private void DrawFaces()
+    private void DrawFaces(HexFaceBooleans exposure)
     {
         m_faces = new List<HexMeshFace>();
 
-        //Top Faces
-        for(int point = 0; point < 6; point++)
+        bool[] renderHexSides = {
+            exposure.sides.side0, 
+            exposure.sides.side1, 
+            exposure.sides.side2, 
+            exposure.sides.side3,
+            exposure.sides.side4,
+            exposure.sides.side5
+        };
+
+
+        if (exposure.top)
         {
-            m_faces.Add(CreateFace(innerSize, outerSize, height / 2f, height / 2f, point));
+            //Top Faces
+            for (int point = 0; point < 6; point++)
+            {
+                m_faces.Add(CreateFace(innerSize, outerSize, height / 2f, height / 2f, point));
+            }
         }
 
-        //Bottom Faces
-        for(int point = 0; point < 6; point++)
+        if(exposure.bottom)
         {
-            m_faces.Add(CreateFace(innerSize, outerSize, -height / 2f, -height / 2f, point, true));
+            //Bottom Faces
+            for (int point = 0; point < 6; point++)
+            {
+                m_faces.Add(CreateFace(innerSize, outerSize, -height / 2f, -height / 2f, point, true));
+            }
         }
 
         //Outer Sides
-        for(int point = 0; point < 6; point++)
+       
+        for (int point = 0; point < 6; point++)
         {
-            m_faces.Add(CreateFace(outerSize, outerSize, height / 2f, -height / 2f, point, true));
+            bool renderThisSide = renderHexSides[point];
+
+            if(renderThisSide)
+            {
+                m_faces.Add(CreateFace(outerSize, outerSize, height / 2f, -height / 2f, point, true));
+            }
         }
 
         //Only draw inner sides if radius is greater than zero
@@ -148,20 +157,5 @@ public class HexRenderer : MonoBehaviour
         List<Vector2> uvs = new List<Vector2>() { new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1) };
 
         return new HexMeshFace(verticies, triangles, uvs);
-    }
-}
-
-public struct HexMeshFace
-{
-    public List<Vector3> verticies { get; private set; }
-    public List<int> triangles { get; private set; }
-
-    public List<Vector2> uvs { get; private set; }
-
-    public HexMeshFace(List<Vector3> verticies, List<int> triangles, List<Vector2> uvs)
-    {
-        this.verticies = verticies;
-        this.triangles = triangles;
-        this.uvs = uvs;
     }
 }
