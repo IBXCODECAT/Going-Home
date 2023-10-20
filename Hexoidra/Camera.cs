@@ -11,13 +11,13 @@ namespace Hexoidra
 {
     internal class Camera
     {
-        private const float SPEED = 8f;
-        private const float FOV = 60;
+        private const float SPEED = 5f;
+        private const float FOV = 45;
 
         private float screenWidth;
         private float screenHeight;
 
-        private float sensitivity = 180f;
+        private float sensitivity = 120f;
 
         public Vector3 position;
 

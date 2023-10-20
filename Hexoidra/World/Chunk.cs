@@ -1,6 +1,7 @@
 ﻿using Hexoidra.Graphics;
 using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL4;
+using SimplexNoise;
 
 namespace Hexoidra.World
 {
@@ -32,58 +33,71 @@ namespace Hexoidra.World
             chunkUVs = new List<Vector2>();
             chunkIndices = new List<uint>();
 
-            GenBlocks();
+            float[,] heightmap = GenChunk();
+
+            GenBlocks(heightmap);
             BuildChunk();
         }
 
-        internal void GenChunk() { }
-
-        private void GenBlocks()
+        private float[,] GenChunk()
         {
-            for(int i = 0; i < 3; i++)
+            float[,] heightmap = new float[CHUNK_SIZE, CHUNK_SIZE];
+
+            Noise.Seed = 123456;
+
+            for(int x = 0; x < CHUNK_SIZE; x++)
             {
-                Block block = new Block(new Vector3(i, 0, 0));
-
-                int faceCount = 0;
-
-                if (i == 0)
+                for(int z  = 0; z < CHUNK_SIZE; z++)
                 {
-                    FaceData leftFaceData = block.GetFace(Faces.LEFT);
-                    chunkVerts.AddRange(leftFaceData.vertices);
-                    chunkUVs.AddRange(leftFaceData.uvs);
-                    faceCount++;
+                    heightmap[x, z] = Noise.CalcPixel2D(x, z, 0.01f);
                 }
-                if (i == 2)
+            }
+
+            return heightmap;
+        }
+
+        private void GenBlocks(float[,] heightmap)
+        {
+            for (int x = 0; x < CHUNK_SIZE; x++)
+            {
+                for (int z = 0; z < CHUNK_SIZE; z++)
                 {
-                    FaceData rightFaceData = block.GetFace(Faces.RIGHT);
-                    chunkVerts.AddRange(rightFaceData.vertices);
-                    chunkUVs.AddRange(rightFaceData.uvs);
-                    faceCount++;
+                    int columnHeight = (int)(heightmap[x, z] / 10);
+
+                    for (int y = 0; y < columnHeight; y++)
+                    {
+                        Block block = new Block(new Vector3(x, y, z));
+
+                        int numFaces = 0;
+
+                        GenerateBlockFace(block, Faces.FRONT);
+                        GenerateBlockFace(block, Faces.BACK);
+                        GenerateBlockFace(block, Faces.LEFT);
+                        GenerateBlockFace(block, Faces.RIGHT);
+                        GenerateBlockFace(block, Faces.TOP);
+                        GenerateBlockFace(block, Faces.BOTTOM);
+
+                        numFaces += 6;
+
+                        AddIndiciesForFaces(numFaces);
+                    }
                 }
-
-                FaceData frontFaceData = block.GetFace(Faces.FRONT);
-                chunkVerts.AddRange(frontFaceData.vertices);
-                chunkUVs.AddRange(frontFaceData.uvs);
-
-                FaceData backFaceData = block.GetFace(Faces.BACK);
-                chunkVerts.AddRange(backFaceData.vertices);
-                chunkUVs.AddRange(backFaceData.uvs);
-
-                FaceData topFaceData = block.GetFace(Faces.TOP);
-                chunkVerts.AddRange(topFaceData.vertices);
-                chunkUVs.AddRange(topFaceData.uvs);
-
-                FaceData bottomFaceData = block.GetFace(Faces.BOTTOM);
-                chunkVerts.AddRange(bottomFaceData.vertices);
-                chunkUVs.AddRange(bottomFaceData.uvs);
-
-                faceCount += 4;
-
-                AddIndiciesForFace(faceCount);
             }
         }
 
-        private void AddIndiciesForFace(int amtFaces)
+        /// <summary>
+        /// Generate a block face
+        /// </summary>
+        /// <param name="block">The block to generate the face for</param>
+        /// <param name="face">The face to generate on the specified block</param>
+        private void GenerateBlockFace(Block block, Faces face)
+        {
+            FaceData data = block.GetFace(face);
+            chunkVerts.AddRange(data.vertices);
+            chunkUVs.AddRange(data.uvs);
+        }
+
+        private void AddIndiciesForFaces(int amtFaces)
         {
             for (int i = 0; i < amtFaces; i++)
             {
