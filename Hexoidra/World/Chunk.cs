@@ -71,14 +71,18 @@ namespace Hexoidra.World
 
                     for (int y = 0; y < CHUNK_HEIGHT; y++)
                     {
-                        if(y < columnHeight[x, z])
+                        BlockType type = BlockType.AIR;
+
+                        if (y < columnHeight[x, z] - 1)
                         {
-                            chunkBlocks[x, y, z] = new Block(new Vector3(x, y, z), BlockType.DIRT);
+                            type = BlockType.DIRT;
                         }
-                        else
+                        else if (y == columnHeight[x, z] - 1)
                         {
-                            chunkBlocks[x, y, z] = new Block(new Vector3(x, y, z), BlockType.AIR);
+                            type = BlockType.GRASS;
                         }
+
+                        chunkBlocks[x, y, z] = new Block(new Vector3(x, y, z), type);
                     }
                 }
             }
