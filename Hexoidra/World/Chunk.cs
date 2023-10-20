@@ -86,6 +86,11 @@ namespace Hexoidra.World
                             type = BlockType.GRASS;
                         }
 
+                        if(y > columnHeight[x, z] + 5)
+                        {
+                            type = BlockType.STONE;
+                        }
+
                         chunkBlocks[x, y, z] = new Block(new Vector3(x, y, z), type);
                     }
                 }
