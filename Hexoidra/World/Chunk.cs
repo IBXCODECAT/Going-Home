@@ -43,16 +43,49 @@ namespace Hexoidra.World
             for(int i = 0; i < 3; i++)
             {
                 Block block = new Block(new Vector3(i, 0, 0));
+
+                int faceCount = 0;
+
+                if (i == 0)
+                {
+                    FaceData leftFaceData = block.GetFace(Faces.LEFT);
+                    chunkVerts.AddRange(leftFaceData.vertices);
+                    chunkUVs.AddRange(leftFaceData.uvs);
+                    faceCount++;
+                }
+                if (i == 2)
+                {
+                    FaceData rightFaceData = block.GetFace(Faces.RIGHT);
+                    chunkVerts.AddRange(rightFaceData.vertices);
+                    chunkUVs.AddRange(rightFaceData.uvs);
+                    faceCount++;
+                }
+
                 FaceData frontFaceData = block.GetFace(Faces.FRONT);
-                chunkVerts.AddRange(frontFaceData.verticies);
+                chunkVerts.AddRange(frontFaceData.vertices);
                 chunkUVs.AddRange(frontFaceData.uvs);
-                AddIndiciesForFace(1);
+
+                FaceData backFaceData = block.GetFace(Faces.BACK);
+                chunkVerts.AddRange(backFaceData.vertices);
+                chunkUVs.AddRange(backFaceData.uvs);
+
+                FaceData topFaceData = block.GetFace(Faces.TOP);
+                chunkVerts.AddRange(topFaceData.vertices);
+                chunkUVs.AddRange(topFaceData.uvs);
+
+                FaceData bottomFaceData = block.GetFace(Faces.BOTTOM);
+                chunkVerts.AddRange(bottomFaceData.vertices);
+                chunkUVs.AddRange(bottomFaceData.uvs);
+
+                faceCount += 4;
+
+                AddIndiciesForFace(faceCount);
             }
         }
 
         private void AddIndiciesForFace(int amtFaces)
         {
-            for(int i = 0; i < amtFaces; i++)
+            for (int i = 0; i < amtFaces; i++)
             {
                 chunkIndices.Add(0 + indexCount);
                 chunkIndices.Add(1 + indexCount);
@@ -72,12 +105,10 @@ namespace Hexoidra.World
 
             chunkVertexBuffer = new VertexBufferObject(chunkVerts);
             chunkVertexBuffer.Bind();
-
             chunkVertexArray.LinkVertexBufferObject(0, 3, chunkVertexBuffer);
 
             chunkUVBuffer = new VertexBufferObject(chunkUVs);
             chunkUVBuffer.Bind();
-
             chunkVertexArray.LinkVertexBufferObject(1, 2, chunkUVBuffer);
 
             chunkIndexBuffer = new IndexBufferObject(chunkIndices);
@@ -88,7 +119,7 @@ namespace Hexoidra.World
         internal void Render(Shader shader)
         {
             shader.Bind();
-            chunkVertexBuffer.Bind();
+            chunkVertexArray.Bind();
             chunkIndexBuffer.Bind();
             texture.Bind();
 

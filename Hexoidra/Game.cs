@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using Hexoidra.Graphics;
+﻿using Hexoidra.Graphics;
 using Hexoidra.World;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using StbImageSharp;
 
 namespace Hexoidra
 {
@@ -23,10 +16,6 @@ namespace Hexoidra
         Camera camera;
 
         Shader shader;
-
-
-        //transformation vars
-        float yRot = 0f;
 
         private int width;
         private int height;
@@ -71,11 +60,14 @@ namespace Hexoidra
         {
             base.OnUnload();
             shader.Dispose();
+
+
+            chunk.Dispose();
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            GL.ClearColor(0.6f, 0.3f, 1f, 1f);
+            GL.ClearColor(0f, 0.7f, 1f, 1f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             // transformation matricies
@@ -100,10 +92,11 @@ namespace Hexoidra
 
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
-            base.OnUpdateFrame(args);
 
             MouseState mouseInput = MouseState;
             KeyboardState keyboardInput = KeyboardState;
+
+            base.OnUpdateFrame(args);
 
             camera.Update(keyboardInput, mouseInput, args);
         }

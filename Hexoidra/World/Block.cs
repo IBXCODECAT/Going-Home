@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 
 namespace Hexoidra.World
 {
@@ -28,43 +22,43 @@ namespace Hexoidra.World
             faces = new Dictionary<Faces, FaceData>()
             {
                 {Faces.FRONT, new FaceData {
-                    verticies = TransformVerticies(RawFaceData.rawVertexData[Faces.FRONT]),
-                    uvs = this.uv
+                    vertices = TransformVerticies(FaceDataRaw.rawVertexData[Faces.FRONT]),
+                    uvs = uv
                 }},
                 {Faces.BACK, new FaceData {
-                    verticies = TransformVerticies(RawFaceData.rawVertexData[Faces.BACK]),
-                    uvs = this.uv
+                    vertices = TransformVerticies(FaceDataRaw.rawVertexData[Faces.BACK]),
+                    uvs = uv
                 }},
                 {Faces.LEFT, new FaceData {
-                    verticies = TransformVerticies(RawFaceData.rawVertexData[Faces.LEFT]),
-                    uvs = this.uv
+                    vertices = TransformVerticies(FaceDataRaw.rawVertexData[Faces.LEFT]),
+                    uvs = uv
                 }},
                 {Faces.RIGHT, new FaceData {
-                    verticies = TransformVerticies(RawFaceData.rawVertexData[Faces.RIGHT]),
-                    uvs = this.uv
+                    vertices = TransformVerticies(FaceDataRaw.rawVertexData[Faces.RIGHT]),
+                    uvs = uv
                 }},
                 {Faces.TOP, new FaceData {
-                    verticies = TransformVerticies(RawFaceData.rawVertexData[Faces.TOP]),
-                    uvs = this.uv
+                    vertices = TransformVerticies(FaceDataRaw.rawVertexData[Faces.TOP]),
+                    uvs = uv
                 }},
                 {Faces.BOTTOM, new FaceData {
-                    verticies = TransformVerticies(RawFaceData.rawVertexData[Faces.BOTTOM]),
-                    uvs = this.uv
+                    vertices = TransformVerticies(FaceDataRaw.rawVertexData[Faces.BOTTOM]),
+                    uvs = uv
                 }},
 
             };
         }
 
-        public List<Vector3> TransformVerticies(List<Vector3> verticies)
+        public List<Vector3> TransformVerticies(List<Vector3> vertices)
         {
-            List<Vector3> transformedVerticies = new List<Vector3>();
+            List<Vector3> transformedVertices = new List<Vector3>();
 
-            foreach(Vector3 vertex in verticies)
+            foreach (var vert in vertices)
             {
-                transformedVerticies.Add(vertex + position);
+                transformedVertices.Add(vert + position);
             }
 
-            return transformedVerticies;
+            return transformedVertices;
         }
 
         public FaceData GetFace(Faces face)
