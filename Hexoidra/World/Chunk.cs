@@ -12,11 +12,12 @@ namespace Hexoidra.World
         private List<uint> chunkIndices;
 
         private const int CHUNK_SIZE = 16;
-        private const int CHUNK_HEIGHT = 32;
+        private const int CHUNK_HEIGHT = 128;
 
         internal Vector3 position;
 
         private uint indexCount;
+
 
 
         private VertexArrayObject chunkVertexArray;
@@ -25,6 +26,7 @@ namespace Hexoidra.World
         private IndexBufferObject chunkIndexBuffer;
         private Texture texture;
 
+        private int[,] columnHeight = new int[CHUNK_SIZE, CHUNK_SIZE];
         private Block[,,] chunkBlocks = new Block[CHUNK_SIZE, CHUNK_HEIGHT, CHUNK_SIZE];
         
         internal Chunk(Vector3 position)
@@ -67,11 +69,13 @@ namespace Hexoidra.World
             {
                 for (int z = 0; z < CHUNK_SIZE; z++)
                 {
-                    int columnHeight = (int)(heightmap[x, z]);
+                    columnHeight[x, z] = (int)(heightmap[x, z] / 10);
+
+                    Console.WriteLine($"{columnHeight}");
 
                     for (int y = 0; y < CHUNK_HEIGHT; y++)
                     {
-                        if(y < columnHeight)
+                        if(y < columnHeight[x, z])
                         {
                             chunkBlocks[x, y, z] = new Block(new Vector3(x, y, z), BlockType.DIRT);
                         }
@@ -90,9 +94,7 @@ namespace Hexoidra.World
             {
                 for(int z = 0; z < CHUNK_SIZE; z++)
                 {
-                    int columnHeight = (int)(heightmap[x, z] / 10);
-
-                    for(int y =0; y < columnHeight; y++)
+                    for(int y = 0; y < columnHeight[x, z]; y++)
                     {
                         int totalFaces = 0;
 
@@ -146,8 +148,6 @@ namespace Hexoidra.World
                         //Right faces - block to right is air or is furthest right in chunk
                         if(x < CHUNK_SIZE - 1)
                         {
-                            Console.WriteLine($"{x} - {chunkBlocks[x + 1, y, z].blockType == BlockType.AIR}");
-
                             if (chunkBlocks[x + 1, y, z].blockType == BlockType.AIR)
                             {
                                 GenerateBlockFace(chunkBlocks[x, y, z], Faces.RIGHT);
@@ -162,7 +162,7 @@ namespace Hexoidra.World
 
                         //Top faces - block above is empty or is the furthest up in chunk
 
-                        if(y < columnHeight - 1)
+                        if(y < columnHeight[x, z] - 1)
                         {
                             if (chunkBlocks[x, y + 1, z].blockType == BlockType.AIR)
                             {
