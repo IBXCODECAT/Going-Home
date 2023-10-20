@@ -25,6 +25,8 @@ namespace Hexoidra.World
         private IndexBufferObject chunkIndexBuffer;
         private Texture texture;
 
+        private Block[,,] chunkBlocks = new Block[CHUNK_SIZE, CHUNK_HEIGHT, CHUNK_SIZE];
+        
         internal Chunk(Vector3 position)
         {
             this.position = position;
@@ -35,7 +37,10 @@ namespace Hexoidra.World
 
             float[,] heightmap = GenChunk();
 
+            Console.WriteLine(heightmap.Length);
+
             GenBlocks(heightmap);
+            GenerateRequiredBlockFaces(heightmap);
             BuildChunk();
         }
 
@@ -62,24 +67,131 @@ namespace Hexoidra.World
             {
                 for (int z = 0; z < CHUNK_SIZE; z++)
                 {
+                    int columnHeight = (int)(heightmap[x, z]);
+
+                    for (int y = 0; y < CHUNK_HEIGHT; y++)
+                    {
+                        if(y < columnHeight)
+                        {
+                            chunkBlocks[x, y, z] = new Block(new Vector3(x, y, z), BlockType.DIRT);
+                        }
+                        else
+                        {
+                            chunkBlocks[x, y, z] = new Block(new Vector3(x, y, z), BlockType.AIR);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void GenerateRequiredBlockFaces(float[,] heightmap)
+        {
+            for(int x = 0; x < CHUNK_SIZE;  x++)
+            {
+                for(int z = 0; z < CHUNK_SIZE; z++)
+                {
                     int columnHeight = (int)(heightmap[x, z] / 10);
 
-                    for (int y = 0; y < columnHeight; y++)
+                    for(int y =0; y < columnHeight; y++)
                     {
-                        Block block = new Block(new Vector3(x, y, z));
+                        int totalFaces = 0;
 
-                        int numFaces = 0;
 
-                        GenerateBlockFace(block, Faces.FRONT);
-                        GenerateBlockFace(block, Faces.BACK);
-                        GenerateBlockFace(block, Faces.LEFT);
-                        GenerateBlockFace(block, Faces.RIGHT);
-                        GenerateBlockFace(block, Faces.TOP);
-                        GenerateBlockFace(block, Faces.BOTTOM);
+                        //front face - block to front is air or is farthest front in chunk
+                        if(z < CHUNK_SIZE - 1)
+                        {
+                            if (chunkBlocks[x, y, z + 1].blockType == BlockType.AIR)
+                            {
+                                GenerateBlockFace(chunkBlocks[x, y, z], Faces.FRONT);
+                                totalFaces++;
+                            }
+                        }
+                        else
+                        {
+                            GenerateBlockFace(chunkBlocks[x, y, z], Faces.FRONT);
+                            totalFaces++;
+                        }
 
-                        numFaces += 6;
+                        //back face
 
-                        AddIndiciesForFaces(numFaces);
+                        if (z > 0)
+                        {
+                            if (chunkBlocks[x, y, z - 1].blockType == BlockType.AIR)
+                            {
+                                GenerateBlockFace(chunkBlocks[x, y, z], Faces.BACK);
+                                totalFaces++;
+                            }
+                        }
+                        else
+                        {
+                            GenerateBlockFace(chunkBlocks[x, y, z], Faces.BACK);
+                            totalFaces++;
+                        }
+
+                        //Left faces - block to left is air or is farthest left in chunk
+                        if (x > 0)
+                        {
+                            if (chunkBlocks[x - 1, y, z].blockType == BlockType.AIR)
+                            {
+                                GenerateBlockFace(chunkBlocks[x, y, z], Faces.LEFT);
+                                totalFaces++;
+                            }
+                        }
+                        else
+                        {
+                            GenerateBlockFace(chunkBlocks[x, y, z], Faces.LEFT);
+                            totalFaces++;
+                        }
+
+                        //Right faces - block to right is air or is furthest right in chunk
+                        if(x < CHUNK_SIZE - 1)
+                        {
+                            Console.WriteLine($"{x} - {chunkBlocks[x + 1, y, z].blockType == BlockType.AIR}");
+
+                            if (chunkBlocks[x + 1, y, z].blockType == BlockType.AIR)
+                            {
+                                GenerateBlockFace(chunkBlocks[x, y, z], Faces.RIGHT);
+                                totalFaces++;
+                            }
+                        }
+                        else
+                        {
+                            GenerateBlockFace(chunkBlocks[x, y, z], Faces.RIGHT);
+                            totalFaces++;
+                        }
+
+                        //Top faces - block above is empty or is the furthest up in chunk
+
+                        if(y < columnHeight - 1)
+                        {
+                            if (chunkBlocks[x, y + 1, z].blockType == BlockType.AIR)
+                            {
+                                GenerateBlockFace(chunkBlocks[x, y, z], Faces.TOP);
+                                totalFaces++;
+                            }
+                        }
+                        else
+                        {
+                            GenerateBlockFace(chunkBlocks[x, y, z], Faces.TOP);
+                            totalFaces++;
+                        }
+                        AddIndiciesForFaces(totalFaces);
+
+                        //Bottom faces - block below is empty or is the furthest down in chunk
+                        if (y > 0)
+                        {
+                            if (chunkBlocks[x, y - 1, z].blockType == BlockType.AIR)
+                            {
+                                GenerateBlockFace(chunkBlocks[x, y, z], Faces.BOTTOM);
+                                totalFaces++;
+                            }
+                        }
+                        else
+                        {
+                            GenerateBlockFace(chunkBlocks[x, y, z], Faces.BOTTOM);
+                            totalFaces++;
+                        }
+                        AddIndiciesForFaces(totalFaces);
                     }
                 }
             }

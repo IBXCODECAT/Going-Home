@@ -4,7 +4,8 @@ namespace Hexoidra.World
 {
     internal class Block
     {
-        public Vector3 position;
+        private Vector3 position;
+        internal BlockType blockType;
 
         private Dictionary<Faces, FaceData> faces;
 
@@ -16,9 +17,11 @@ namespace Hexoidra.World
             new Vector2(0f, 0f), //bottom left uv
         };
 
-        public Block(Vector3 position)
+        public Block(Vector3 position, BlockType blockType = BlockType.AIR)
         {
             this.position = position;
+            this.blockType = blockType;
+            
             faces = new Dictionary<Faces, FaceData>()
             {
                 {Faces.FRONT, new FaceData {

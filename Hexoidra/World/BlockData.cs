@@ -2,6 +2,12 @@
 
 namespace Hexoidra.World
 {
+    public enum BlockType
+    {
+        AIR,
+        DIRT
+    }
+
     public enum Faces
     {
         FRONT,

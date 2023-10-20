@@ -51,6 +51,10 @@ namespace Hexoidra
             //Enable Depth Tests (Render closer objects on top of others)
             GL.Enable(EnableCap.DepthTest);
 
+            //Enable backface mesh culling
+            GL.FrontFace(FrontFaceDirection.Cw);
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Back);
 
             camera = new Camera(width, height, Vector3.Zero);
             CursorState = CursorState.Grabbed;
