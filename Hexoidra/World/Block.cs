@@ -23,12 +23,13 @@ namespace Hexoidra.World
         {
             this.position = position;
             this.blockType = blockType;
-            
-            if(blockType != BlockType.AIR)
-            {
-                blockUV = TextureData.blockTypeUvs[blockType];
-            }
 
+            
+            if (blockType != BlockType.AIR)
+            {
+                blockUV = GetUvsFromAtlasCoordinates(TextureData.blockTypeUVCoordinates[blockType]);
+            }
+            
             faces = new Dictionary<Faces, FaceData>()
             {
                 {Faces.FRONT, new FaceData {
@@ -57,6 +58,24 @@ namespace Hexoidra.World
                 }},
 
             };
+        }
+
+        private Dictionary<Faces, List<Vector2>> GetUvsFromAtlasCoordinates(Dictionary<Faces, Vector2> coords)
+        {
+            Dictionary<Faces, List<Vector2>> faceData = new Dictionary<Faces, List<Vector2>>();
+
+            foreach(KeyValuePair<Faces, Vector2> faceCoord in coords)
+            {
+                faceData[faceCoord.Key] = new List<Vector2>
+                {
+                    new Vector2((faceCoord.Value.X + 1f) / TextureData.ATLAS_SIZE, (faceCoord.Value.Y + 1f) /TextureData.ATLAS_SIZE),
+                    new Vector2(faceCoord.Value.X / TextureData.ATLAS_SIZE, (faceCoord.Value.Y + 1f) / TextureData.ATLAS_SIZE),
+                    new Vector2(faceCoord.Value.X / TextureData.ATLAS_SIZE, faceCoord.Value.Y / TextureData.ATLAS_SIZE),
+                    new Vector2((faceCoord.Value.X + 1f) / TextureData.ATLAS_SIZE, faceCoord.Value.Y / TextureData.ATLAS_SIZE),
+                };
+            }
+
+            return faceData;
         }
 
         public List<Vector3> TransformVerticies(List<Vector3> vertices)

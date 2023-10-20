@@ -73,7 +73,11 @@ namespace Hexoidra.World
                     {
                         BlockType type = BlockType.AIR;
 
-                        if (y < columnHeight[x, z] - 1)
+                        if(y < columnHeight[x, z] - 3)
+                        {
+                            type = BlockType.STONE;
+                        }
+                        else if (y < columnHeight[x, z] - 1)
                         {
                             type = BlockType.DIRT;
                         }

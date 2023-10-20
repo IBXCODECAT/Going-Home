@@ -6,7 +6,8 @@ namespace Hexoidra.World
     {
         AIR,
         GRASS,
-        DIRT
+        DIRT,
+        STONE
     }
 
     public enum Faces
