@@ -9,12 +9,14 @@ namespace Hexoidra.World
 
         private Dictionary<Faces, FaceData> faces;
 
-        private List<Vector2> uv = new List<Vector2>()
+        internal Dictionary<Faces, List<Vector2>> blockUV = new Dictionary<Faces, List<Vector2>>()
         {
-            new Vector2(0f, 1f), //top left uv
-            new Vector2(1f, 1f), //top right uv
-            new Vector2(1f, 0f), //bottom right uv
-            new Vector2(0f, 0f), //bottom left uv
+            { Faces.FRONT, new List<Vector2>() },
+            { Faces.BACK, new List<Vector2>() },
+            { Faces.LEFT, new List<Vector2>() },
+            { Faces.RIGHT, new List<Vector2>() },
+            { Faces.TOP, new List<Vector2>() },
+            { Faces.BOTTOM, new List<Vector2>() },
         };
 
         public Block(Vector3 position, BlockType blockType = BlockType.AIR)
@@ -22,31 +24,36 @@ namespace Hexoidra.World
             this.position = position;
             this.blockType = blockType;
             
+            if(blockType != BlockType.AIR)
+            {
+                blockUV = TextureData.blockTypeUvs[blockType];
+            }
+
             faces = new Dictionary<Faces, FaceData>()
             {
                 {Faces.FRONT, new FaceData {
                     vertices = TransformVerticies(FaceDataRaw.rawVertexData[Faces.FRONT]),
-                    uvs = uv
+                    uvs = blockUV[Faces.FRONT]
                 }},
                 {Faces.BACK, new FaceData {
                     vertices = TransformVerticies(FaceDataRaw.rawVertexData[Faces.BACK]),
-                    uvs = uv
+                    uvs = blockUV[Faces.BACK]
                 }},
                 {Faces.LEFT, new FaceData {
                     vertices = TransformVerticies(FaceDataRaw.rawVertexData[Faces.LEFT]),
-                    uvs = uv
+                    uvs = blockUV[Faces.LEFT]
                 }},
                 {Faces.RIGHT, new FaceData {
                     vertices = TransformVerticies(FaceDataRaw.rawVertexData[Faces.RIGHT]),
-                    uvs = uv
+                    uvs = blockUV[Faces.RIGHT]
                 }},
                 {Faces.TOP, new FaceData {
                     vertices = TransformVerticies(FaceDataRaw.rawVertexData[Faces.TOP]),
-                    uvs = uv
+                    uvs = blockUV[Faces.TOP]
                 }},
                 {Faces.BOTTOM, new FaceData {
                     vertices = TransformVerticies(FaceDataRaw.rawVertexData[Faces.BOTTOM]),
-                    uvs = uv
+                    uvs = blockUV[Faces.BOTTOM]
                 }},
 
             };

@@ -39,8 +39,6 @@ namespace Hexoidra.World
 
             float[,] heightmap = GenChunk();
 
-            Console.WriteLine(heightmap.Length);
-
             GenBlocks(heightmap);
             GenerateRequiredBlockFaces(heightmap);
             BuildChunk();
@@ -70,8 +68,6 @@ namespace Hexoidra.World
                 for (int z = 0; z < CHUNK_SIZE; z++)
                 {
                     columnHeight[x, z] = (int)(heightmap[x, z] / 10);
-
-                    Console.WriteLine($"{columnHeight}");
 
                     for (int y = 0; y < CHUNK_HEIGHT; y++)
                     {
@@ -239,7 +235,7 @@ namespace Hexoidra.World
 
             chunkIndexBuffer = new IndexBufferObject(chunkIndices);
 
-            texture = new Texture("tex.png");
+            texture = new Texture("atlas.png");
         }
 
         internal void Render(Shader shader)

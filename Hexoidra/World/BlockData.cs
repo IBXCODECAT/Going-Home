@@ -5,6 +5,7 @@ namespace Hexoidra.World
     public enum BlockType
     {
         AIR,
+        GRASS,
         DIRT
     }
 
