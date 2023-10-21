@@ -44,7 +44,7 @@ namespace Hexoidra
         {
             base.OnLoad();
 
-            chunk = new Chunk(new Vector3(0, 0, 0));
+            chunk = new Chunk(new Chunk.ChunkPositionInfo(new Vector2i(0, 0)));
 
             shader = new Shader("default.vert", "default.frag");
 

@@ -5,16 +5,32 @@ using SimplexNoise;
 
 namespace Hexoidra.World
 {
-    internal class Chunk
+    public class Chunk
     {
+        /// <summary>
+        /// Contains the coordinates for a chunk in both chunk coords  (EX: (1, 1)) and
+        /// and position (Ex: (1 * CHUNK_SIZE, 1 * CHUNK_SIZE)
+        /// </summary>
+        internal struct ChunkPositionInfo
+        {
+            internal Vector2i chunkCoords;
+            internal Vector2i position;
+
+            internal ChunkPositionInfo(Vector2i position)
+            {
+                this.chunkCoords = position;
+                this.position = position * CHUNK_SIZE;
+            }
+        }
+
         private List<Vector3> chunkVerts;
         private List<Vector2> chunkUVs;
         private List<uint> chunkIndices;
 
-        private const int CHUNK_SIZE = 16;
-        private const int CHUNK_HEIGHT = 128;
+        public const int CHUNK_SIZE = 16;
+        public const int CHUNK_HEIGHT = 128;
 
-        internal Vector3 position;
+        internal ChunkPositionInfo position;
 
         private uint indexCount;
 
@@ -29,7 +45,7 @@ namespace Hexoidra.World
         private int[,] columnHeight = new int[CHUNK_SIZE, CHUNK_SIZE];
         private Block[,,] chunkBlocks = new Block[CHUNK_SIZE, CHUNK_HEIGHT, CHUNK_SIZE];
         
-        internal Chunk(Vector3 position)
+        internal Chunk(ChunkPositionInfo position)
         {
             this.position = position;
 
@@ -37,67 +53,18 @@ namespace Hexoidra.World
             chunkUVs = new List<Vector2>();
             chunkIndices = new List<uint>();
 
-            float[,] heightmap = GenChunk();
+            chunkBlocks = WorldGen.GenChunkBlocks(position);
 
-            GenBlocks(heightmap);
-            GenerateRequiredBlockFaces(heightmap);
+            ConstructOptimizedMesh();
             BuildChunk();
         }
 
-        private float[,] GenChunk()
-        {
-            float[,] heightmap = new float[CHUNK_SIZE, CHUNK_SIZE];
-
-            Noise.Seed = 123456;
-
-            for(int x = 0; x < CHUNK_SIZE; x++)
-            {
-                for(int z  = 0; z < CHUNK_SIZE; z++)
-                {
-                    heightmap[x, z] = Noise.CalcPixel2D(x, z, 0.01f);
-                }
-            }
-
-            return heightmap;
-        }
-
-        private void GenBlocks(float[,] heightmap)
-        {
-            for (int x = 0; x < CHUNK_SIZE; x++)
-            {
-                for (int z = 0; z < CHUNK_SIZE; z++)
-                {
-                    columnHeight[x, z] = (int)(heightmap[x, z] / 10);
-
-                    for (int y = 0; y < CHUNK_HEIGHT; y++)
-                    {
-                        BlockType type = BlockType.AIR;
-
-                        if(y < columnHeight[x, z] - 3)
-                        {
-                            type = BlockType.STONE;
-                        }
-                        else if (y < columnHeight[x, z] - 1)
-                        {
-                            type = BlockType.DIRT;
-                        }
-                        else if (y == columnHeight[x, z] - 1)
-                        {
-                            type = BlockType.GRASS;
-                        }
-
-                        if(y > columnHeight[x, z] + 5)
-                        {
-                            type = BlockType.STONE;
-                        }
-
-                        chunkBlocks[x, y, z] = new Block(new Vector3(x, y, z), type);
-                    }
-                }
-            }
-        }
-
-        private void GenerateRequiredBlockFaces(float[,] heightmap)
+        /// <summary>
+        /// Constructs an optimized chunk mesh so that each block only renders
+        /// its face if it is visible to the player (touching air)
+        /// [or is on chunk edge]
+        /// </summary>
+        private void ConstructOptimizedMesh()
         {
             for(int x = 0; x < CHUNK_SIZE;  x++)
             {
@@ -204,8 +171,6 @@ namespace Hexoidra.World
 
                             AddIndiciesForFaces(totalFaces);
                         }
-
-                        
                     }
                 }
             }

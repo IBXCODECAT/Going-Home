@@ -11,18 +11,18 @@ namespace Hexoidra
 {
     internal class Camera
     {
-        private const float SPEED = 5f;
+        private const float SPEED = 8f;
         private const float FOV = 45;
 
         private float screenWidth;
         private float screenHeight;
 
-        private float sensitivity = 120f;
+        private float sensitivity = 180f;
 
         public Vector3 position;
 
         private Vector3 up = Vector3.UnitY;
-        private Vector3 front = -Vector3.UnitZ;
+        private Vector3 relativeForward = -Vector3.UnitZ;
         private Vector3 right = Vector3.UnitX;
 
         private float pitch;
@@ -44,7 +44,7 @@ namespace Hexoidra
         {
             return Matrix4.LookAt(
                 position, //Eye position
-                position + front, //Target (front)
+                position + relativeForward, //Target (front)
                 up //Up Vector
             );
         }
@@ -71,15 +71,15 @@ namespace Hexoidra
                 pitch = -89;
             }
 
-            front.X = MathF.Cos(MathHelper.DegreesToRadians(pitch)) * MathF.Cos(MathHelper.DegreesToRadians(yaw));
-            front.Y = MathF.Sin(MathHelper.DegreesToRadians(pitch));
-            front.Z = MathF.Cos(MathHelper.DegreesToRadians(pitch)) * MathF.Sin(MathHelper.DegreesToRadians(yaw));
+            relativeForward.X = MathF.Cos(MathHelper.DegreesToRadians(pitch)) * MathF.Cos(MathHelper.DegreesToRadians(yaw));
+            relativeForward.Y = MathF.Sin(MathHelper.DegreesToRadians(pitch));
+            relativeForward.Z = MathF.Cos(MathHelper.DegreesToRadians(pitch)) * MathF.Sin(MathHelper.DegreesToRadians(yaw));
 
-            front = Vector3.Normalize(front);
+            relativeForward = Vector3.Normalize(relativeForward);
 
             //Cross multiply vectors
-            right = Vector3.Normalize(Vector3.Cross(front, Vector3.UnitY));
-            up = Vector3.Normalize(Vector3.Cross(right, front));
+            right = Vector3.Normalize(Vector3.Cross(relativeForward, Vector3.UnitY));
+            up = Vector3.Normalize(Vector3.Cross(right, relativeForward));
         }
 
         public void InputController(KeyboardState keyboardInput, MouseState mouseInput, FrameEventArgs e)
@@ -87,7 +87,7 @@ namespace Hexoidra
             //Move forward (relative forward)
             if(keyboardInput.IsKeyDown(Keys.W))
             {
-                position += front * SPEED * (float)e.Time;
+                position += new Vector3(relativeForward.X, 0f, relativeForward.Z) * SPEED * (float)e.Time;
             }
             
             //Move left (relative left)
@@ -99,7 +99,7 @@ namespace Hexoidra
             //Move back (relative back)
             if (keyboardInput.IsKeyDown(Keys.S))
             {
-                position -= front * SPEED* (float)e.Time;
+                position -= new Vector3(relativeForward.X, 0f, relativeForward.Z) * SPEED * (float)e.Time;
             }
 
             //Move right (relative right)
