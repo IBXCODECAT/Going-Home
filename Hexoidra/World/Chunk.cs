@@ -2,6 +2,7 @@
 using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL4;
 using SimplexNoise;
+using System.Runtime.CompilerServices;
 
 namespace Hexoidra.World
 {
@@ -14,12 +15,12 @@ namespace Hexoidra.World
         internal struct ChunkPositionInfo
         {
             internal Vector2i chunkCoords;
-            internal Vector2i blockStartPosition;
+            internal Vector2i chunkXYOriginInWorldSpace;
 
             internal ChunkPositionInfo(Vector2i position)
             {
                 this.chunkCoords = position;
-                this.blockStartPosition = position * CHUNK_SIZE;
+                this.chunkXYOriginInWorldSpace = position * CHUNK_SIZE;
             }
         }
 
@@ -27,7 +28,7 @@ namespace Hexoidra.World
         private List<Vector2> chunkUVs;
         private List<uint> chunkIndices;
 
-        public const int CHUNK_SIZE = 16;
+        public const int CHUNK_SIZE = 32;
         public const int CHUNK_HEIGHT = 128;
 
         internal ChunkPositionInfo position;

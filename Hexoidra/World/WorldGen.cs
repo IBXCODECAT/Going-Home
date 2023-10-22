@@ -17,38 +17,47 @@ namespace Hexoidra.World
             {
                 for (int z = 0; z < Chunk.CHUNK_SIZE; z++)
                 {
-                    heightmap[x, z] = Noise.CalcPixel2D(x + chunkInfo.blockStartPosition.X, z + chunkInfo.blockStartPosition.Y, 0.01f);
+                    heightmap[x, z] = Noise.CalcPixel2D(x + chunkInfo.chunkXYOriginInWorldSpace.X, z + chunkInfo.chunkXYOriginInWorldSpace.Y, 0.01f);
                 }
             }
 
             //Create an array to store the block data for this chunk
             Block[,,] chunkBlocks = new Block[Chunk.CHUNK_SIZE, Chunk.CHUNK_HEIGHT, Chunk.CHUNK_SIZE];
 
-            for (int x = 0; x < Chunk.CHUNK_SIZE; x++)
+            for (int blockPosX = 0; blockPosX < Chunk.CHUNK_SIZE; blockPosX++)
             {
-                for (int z = 0; z < Chunk.CHUNK_SIZE; z++)
+                for (int blockPosZ = 0; blockPosZ < Chunk.CHUNK_SIZE; blockPosZ++)
                 {
-                    heightmap[x, z] = (int)(heightmap[x, z] / 10);
+                    heightmap[blockPosX, blockPosZ] = (int)(heightmap[blockPosX, blockPosZ] / 10);
 
-                    for (int y = 0; y < Chunk.CHUNK_HEIGHT; y++)
+                    for (int blockPosY = 0; blockPosY < Chunk.CHUNK_HEIGHT; blockPosY++)
                     {
-                        BlockType type = BlockType.AIR;
+                        BlockType blockType = BlockType.AIR;
 
-                        if (y < heightmap[x, z] - rng.Next(3, 5))
+                        if (blockPosY < heightmap[blockPosX, blockPosZ] - rng.Next(3, 5))
                         {
-                            type = BlockType.STONE;
+                            blockType = BlockType.STONE;
                         }
-                        else if (y < heightmap[x, z] - 1)
+                        else if (blockPosY < heightmap[blockPosX, blockPosZ] - 1)
                         {
-                            type = BlockType.DIRT;
+                            blockType = BlockType.DIRT;
                         }
-                        else if (y == heightmap[x, z] - 1)
+                        else if (blockPosY == heightmap[blockPosX, blockPosZ] - 1)
                         {
-                            type = BlockType.GRASS;
+                            blockType = BlockType.GRASS;
                         }
 
-                        //Generate this block and offset the block's position by the chunk's offset
-                        chunkBlocks[x, y, z] = new Block(new Vector3(chunkInfo.blockStartPosition.X + x, y, chunkInfo.blockStartPosition.Y + z), type);
+                        //Generate this block and offset the block's X/-/Z positions by the chunk's X/Y offset
+                        chunkBlocks[blockPosX, blockPosY, blockPosZ] = new Block
+                        (
+                            new Vector3
+                            (
+                                chunkInfo.chunkXYOriginInWorldSpace.X + blockPosX,
+                                blockPosY,
+                                chunkInfo.chunkXYOriginInWorldSpace.Y + blockPosZ
+                            ),
+                            blockType
+                        );
                     }
                 }
             }
