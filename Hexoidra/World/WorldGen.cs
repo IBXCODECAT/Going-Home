@@ -5,6 +5,8 @@ namespace Hexoidra.World
 {
     internal class WorldGen
     {
+        private static Random rng = new Random();
+
         internal static Block[,,] GenChunkBlocks(Chunk.ChunkPositionInfo chunkInfo)
         {
             float[,] heightmap = new float[Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE];
@@ -31,7 +33,7 @@ namespace Hexoidra.World
                     {
                         BlockType type = BlockType.AIR;
 
-                        if (y < heightmap[x, z] - 3)
+                        if (y < heightmap[x, z] - rng.Next(3, 5))
                         {
                             type = BlockType.STONE;
                         }
@@ -42,11 +44,6 @@ namespace Hexoidra.World
                         else if (y == heightmap[x, z] - 1)
                         {
                             type = BlockType.GRASS;
-                        }
-
-                        if (y > heightmap[x, z] + 5)
-                        {
-                            type = BlockType.STONE;
                         }
 
                         chunkBlocks[x, y, z] = new Block(new Vector3(x, y, z), type);

@@ -27,14 +27,12 @@ namespace Hexoidra.World
         private List<Vector2> chunkUVs;
         private List<uint> chunkIndices;
 
-        public const int CHUNK_SIZE = 16;
+        public const int CHUNK_SIZE = 32;
         public const int CHUNK_HEIGHT = 128;
 
         internal ChunkPositionInfo position;
 
         private uint indexCount;
-
-
 
         private VertexArrayObject chunkVertexArray;
         private VertexBufferObject chunkVertexBuffer;
@@ -42,7 +40,6 @@ namespace Hexoidra.World
         private IndexBufferObject chunkIndexBuffer;
         private Texture texture;
 
-        private int[,] columnHeight = new int[CHUNK_SIZE, CHUNK_SIZE];
         private Block[,,] chunkBlocks = new Block[CHUNK_SIZE, CHUNK_HEIGHT, CHUNK_SIZE];
         
         internal Chunk(ChunkPositionInfo position)

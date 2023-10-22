@@ -22,7 +22,6 @@ namespace Hexoidra
 
         public Game(int width, int height) : base(GameWindowSettings.Default, NativeWindowSettings.Default)
         {
-
             this.width = width;
             this.height = height;
 

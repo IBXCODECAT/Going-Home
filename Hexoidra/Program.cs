@@ -1,5 +1,4 @@
-﻿
-namespace Hexoidra
+﻿namespace Hexoidra
 {
     class Program
     {
@@ -7,6 +6,7 @@ namespace Hexoidra
         {
             using(Game game = new Game(920, 540))
             {
+                game.Title = "Going Home";
                 game.Run();
             }
         }
