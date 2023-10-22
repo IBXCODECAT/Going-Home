@@ -30,7 +30,7 @@
 
         private static void ValidateChunkCache()
         {
-            //Make sure chunk cache stays under a memory limit (EX: 512 mb)
+
         }
     }
 }

@@ -28,14 +28,14 @@ namespace Hexoidra.World
             {
                 for (int blockPosZ = 0; blockPosZ < Chunk.CHUNK_SIZE; blockPosZ++)
                 {
-                    heightmap[blockPosX, blockPosZ] = (int)(heightmap[blockPosX, blockPosZ] / 10);
+                    heightmap[blockPosX, blockPosZ] = (int)heightmap[blockPosX, blockPosZ] / 10 + 25;
 
                     for (int blockPosY = 0; blockPosY < Chunk.CHUNK_HEIGHT; blockPosY++)
                     {
                         BlockType blockType = BlockType.AIR;
 
                         if (blockPosY < heightmap[blockPosX, blockPosZ] - rng.Next(3, 5))
-                        {
+                        {   
                             blockType = BlockType.STONE;
                         }
                         else if (blockPosY < heightmap[blockPosX, blockPosZ] - 1)
