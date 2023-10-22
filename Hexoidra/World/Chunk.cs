@@ -14,12 +14,12 @@ namespace Hexoidra.World
         internal struct ChunkPositionInfo
         {
             internal Vector2i chunkCoords;
-            internal Vector2i position;
+            internal Vector2i blockStartPosition;
 
             internal ChunkPositionInfo(Vector2i position)
             {
                 this.chunkCoords = position;
-                this.position = position * CHUNK_SIZE;
+                this.blockStartPosition = position * CHUNK_SIZE;
             }
         }
 
@@ -27,7 +27,7 @@ namespace Hexoidra.World
         private List<Vector2> chunkUVs;
         private List<uint> chunkIndices;
 
-        public const int CHUNK_SIZE = 32;
+        public const int CHUNK_SIZE = 16;
         public const int CHUNK_HEIGHT = 128;
 
         internal ChunkPositionInfo position;

@@ -17,10 +17,11 @@ namespace Hexoidra.World
             {
                 for (int z = 0; z < Chunk.CHUNK_SIZE; z++)
                 {
-                    heightmap[x, z] = Noise.CalcPixel2D(x + chunkInfo.position.X, z + chunkInfo.position.Y, 0.01f);
+                    heightmap[x, z] = Noise.CalcPixel2D(x + chunkInfo.blockStartPosition.X, z + chunkInfo.blockStartPosition.Y, 0.01f);
                 }
             }
 
+            //Create an array to store the block data for this chunk
             Block[,,] chunkBlocks = new Block[Chunk.CHUNK_SIZE, Chunk.CHUNK_HEIGHT, Chunk.CHUNK_SIZE];
 
             for (int x = 0; x < Chunk.CHUNK_SIZE; x++)
@@ -46,7 +47,8 @@ namespace Hexoidra.World
                             type = BlockType.GRASS;
                         }
 
-                        chunkBlocks[x, y, z] = new Block(new Vector3(x, y, z), type);
+                        //Generate this block and offset the block's position by the chunk's offset
+                        chunkBlocks[x, y, z] = new Block(new Vector3(chunkInfo.blockStartPosition.X + x, y, chunkInfo.blockStartPosition.Y + z), type);
                     }
                 }
             }

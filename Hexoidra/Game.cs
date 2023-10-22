@@ -11,7 +11,8 @@ namespace Hexoidra
     internal class Game : GameWindow
     {
 
-        Chunk chunk;
+        Chunk chunk1;
+        Chunk chunk2;
 
         Camera camera;
 
@@ -43,7 +44,8 @@ namespace Hexoidra
         {
             base.OnLoad();
 
-            chunk = new Chunk(new Chunk.ChunkPositionInfo(new Vector2i(0, 0)));
+            chunk1 = new Chunk(new Chunk.ChunkPositionInfo(new Vector2i(0, 0)));
+            chunk2 = new Chunk(new Chunk.ChunkPositionInfo(new Vector2i(0, 1)));
 
             shader = new Shader("default.vert", "default.frag");
 
@@ -65,7 +67,8 @@ namespace Hexoidra
             shader.Dispose();
 
 
-            chunk.Dispose();
+            chunk1.Dispose();
+            chunk2.Dispose();
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -86,7 +89,8 @@ namespace Hexoidra
             GL.UniformMatrix4(viewLocation, true, ref view);
             GL.UniformMatrix4(projectionLocation, true, ref projection);
 
-            chunk.Render(shader);
+            chunk1.Render(shader);
+            chunk2.Render(shader);
 
             Context.SwapBuffers();
 
