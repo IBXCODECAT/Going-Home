@@ -34,7 +34,6 @@ namespace Hexoidra.World
                 {Faces.TOP, new Vector2(1f, 15f) },
                 {Faces.BOTTOM, new Vector2(1f, 15f) },
             } },
-
         };
     }
 }

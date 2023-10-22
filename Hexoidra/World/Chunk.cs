@@ -227,6 +227,10 @@ namespace Hexoidra.World
             texture.Bind();
 
             GL.DrawElements(PrimitiveType.Triangles, chunkIndices.Count, DrawElementsType.UnsignedInt, 0);
+
+            texture.Unbind();
+            chunkIndexBuffer.Unbind();
+            chunkVertexArray.Unbind();
         }
 
         internal void Dispose()
