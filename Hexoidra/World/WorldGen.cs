@@ -1,5 +1,6 @@
 ﻿using SimplexNoise;
 using OpenTK.Mathematics;
+using Hexoidra.Data;
 
 namespace Hexoidra.World
 {
