@@ -59,7 +59,7 @@ namespace Hexoidra
                 MathHelper.DegreesToRadians(FOV), //FOV
                 screenWidth / screenHeight, //Aspect
                 0.1f, //Near clip
-                100f //Far clip
+                10000f //Far clip
             );
         }
 

@@ -28,8 +28,8 @@ namespace Hexoidra.World
         private List<Vector2> chunkUVs;
         private List<uint> chunkIndices;
 
-        public const int CHUNK_SIZE = 32;
-        public const int CHUNK_HEIGHT = 128;
+        public const int CHUNK_SIZE = 16;
+        public const int CHUNK_HEIGHT = 64;
 
         internal ChunkPositionInfo position;
 
@@ -227,6 +227,8 @@ namespace Hexoidra.World
             texture.Bind();
 
             GL.DrawElements(PrimitiveType.Triangles, chunkIndices.Count, DrawElementsType.UnsignedInt, 0);
+
+            Console.WriteLine($"Rendering Chunk @ {position.chunkCoords.X}, {position.chunkCoords.Y}");
 
             texture.Unbind();
             chunkIndexBuffer.Unbind();

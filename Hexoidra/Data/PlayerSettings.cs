@@ -9,6 +9,6 @@ namespace Hexoidra.Data
 {
     public class PlayerSettings
     {
-        public const int RENDER_DISTANCE = 10;
+        public const int RENDER_DISTANCE = 4;
     }
 }
