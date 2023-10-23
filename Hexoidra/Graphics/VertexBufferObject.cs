@@ -1,10 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using OpenTK.Graphics.OpenGL4;
 
 namespace Hexoidra.Graphics
@@ -39,7 +33,7 @@ namespace Hexoidra.Graphics
         /// <summary>
         /// Unbinds this VertexBufferObject
         /// </summary>
-        internal void UnBind() { GL.BindBuffer(BufferTarget.ArrayBuffer, 0); }
+        internal void Unbind() { GL.BindBuffer(BufferTarget.ArrayBuffer, 0); }
 
         /// <summary>
         /// Disposes of this VertexBufferObject

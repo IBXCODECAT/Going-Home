@@ -5,9 +5,11 @@ namespace Hexoidra.World
     public enum BlockType
     {
         AIR,
+        DOLOMITE,
+        SLATE,
         GRASS,
         DIRT,
-        STONE
+        COAL
     }
 
     public enum Faces

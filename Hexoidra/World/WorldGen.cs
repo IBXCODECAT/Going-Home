@@ -34,9 +34,15 @@ namespace Hexoidra.World
                     {
                         BlockType blockType = BlockType.AIR;
 
-                        if (blockPosY < heightmap[blockPosX, blockPosZ] - rng.Next(3, 5))
-                        {   
-                            blockType = BlockType.STONE;
+                        if (blockPosY < heightmap[blockPosX, blockPosZ] - rng.Next(14, 15))
+                        {
+                            blockType = BlockType.SLATE;
+                        }
+                        else if (blockPosY < heightmap[blockPosX, blockPosZ] - rng.Next(3, 5))
+                        {
+                            blockType = BlockType.DOLOMITE;
+
+                            if (rng.Next(0, 5) == 1) blockType = BlockType.COAL;
                         }
                         else if (blockPosY < heightmap[blockPosX, blockPosZ] - 1)
                         {

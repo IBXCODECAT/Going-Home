@@ -10,10 +10,6 @@ namespace Hexoidra
 {
     internal class Game : GameWindow
     {
-
-        Chunk chunk1;
-        Chunk chunk2;
-
         Camera camera;
 
         Shader shader;
@@ -44,9 +40,6 @@ namespace Hexoidra
         {
             base.OnLoad();
 
-            chunk1 = new Chunk(new Chunk.ChunkPositionInfo(new Vector2i(0, 0)));
-            chunk2 = new Chunk(new Chunk.ChunkPositionInfo(new Vector2i(0, 1)));
-
             shader = new Shader("default.vert", "default.frag");
 
             //Enable Depth Tests (Render closer objects on top of others)
@@ -66,9 +59,7 @@ namespace Hexoidra
             base.OnUnload();
             shader.Dispose();
 
-
-            chunk1.Dispose();
-            chunk2.Dispose();
+            ChunkManager.DisposeAll();
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -89,8 +80,7 @@ namespace Hexoidra
             GL.UniformMatrix4(viewLocation, true, ref view);
             GL.UniformMatrix4(projectionLocation, true, ref projection);
 
-            chunk1.Render(shader);
-            chunk2.Render(shader);
+            ChunkManager.RenderAll(shader);
 
             Context.SwapBuffers();
 
@@ -102,6 +92,8 @@ namespace Hexoidra
 
             MouseState mouseInput = MouseState;
             KeyboardState keyboardInput = KeyboardState;
+
+            ChunkManager.BuildAll();
 
             base.OnUpdateFrame(args);
 

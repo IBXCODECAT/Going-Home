@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using Hexoidra.Data;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
@@ -19,7 +20,7 @@ namespace Hexoidra
 
         private float sensitivity = 180f;
 
-        public Vector3 position;
+        private Vector3 position;
 
         private Vector3 up = Vector3.UnitY;
         private Vector3 relativeForward = -Vector3.UnitZ;
@@ -42,6 +43,9 @@ namespace Hexoidra
 
         public Matrix4 GetViewMatrix()
         {
+            PlayerInfo.playerPosition = position;
+            PlayerInfo.playerCoordinates = (Vector3i)position;
+
             return Matrix4.LookAt(
                 position, //Eye position
                 position + relativeForward, //Target (front)
