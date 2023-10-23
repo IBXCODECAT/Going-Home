@@ -3,6 +3,7 @@ using OpenTK.Mathematics;
 using OpenTK.Graphics.OpenGL4;
 using SimplexNoise;
 using System.Runtime.CompilerServices;
+using Hexoidra.Data;
 
 namespace Hexoidra.World
 {
@@ -35,8 +36,8 @@ namespace Hexoidra.World
 
         private uint indexCount;
 
-        private VertexArrayObject chunkVertexArray;
-        private VertexBufferObject chunkVertexBuffer;
+        private VertexArrayObject chunkVAO;
+        private VertexBufferObject chunkVBO;
         private VertexBufferObject chunkUVBuffer;
         private IndexBufferObject chunkIndexBuffer;
         private Texture texture;
@@ -79,13 +80,13 @@ namespace Hexoidra.World
                             {
                                 if (chunkBlocks[x, y, z + 1].blockType == BlockType.AIR)
                                 {
-                                    GenerateBlockFace(chunkBlocks[x, y, z], Faces.FRONT);
+                                    GenerateBlockFace(chunkBlocks[x, y, z], BlockFace.FRONT);
                                     totalFaces++;
                                 }
                             }
                             else
                             {
-                                GenerateBlockFace(chunkBlocks[x, y, z], Faces.FRONT);
+                                GenerateBlockFace(chunkBlocks[x, y, z], BlockFace.FRONT);
                                 totalFaces++;
                             }
 
@@ -95,13 +96,13 @@ namespace Hexoidra.World
                             {
                                 if (chunkBlocks[x, y, z - 1].blockType == BlockType.AIR)
                                 {
-                                    GenerateBlockFace(chunkBlocks[x, y, z], Faces.BACK);
+                                    GenerateBlockFace(chunkBlocks[x, y, z], BlockFace.BACK);
                                     totalFaces++;
                                 }
                             }
                             else
                             {
-                                GenerateBlockFace(chunkBlocks[x, y, z], Faces.BACK);
+                                GenerateBlockFace(chunkBlocks[x, y, z], BlockFace.BACK);
                                 totalFaces++;
                             }
 
@@ -110,13 +111,13 @@ namespace Hexoidra.World
                             {
                                 if (chunkBlocks[x - 1, y, z].blockType == BlockType.AIR)
                                 {
-                                    GenerateBlockFace(chunkBlocks[x, y, z], Faces.LEFT);
+                                    GenerateBlockFace(chunkBlocks[x, y, z], BlockFace.LEFT);
                                     totalFaces++;
                                 }
                             }
                             else
                             {
-                                GenerateBlockFace(chunkBlocks[x, y, z], Faces.LEFT);
+                                GenerateBlockFace(chunkBlocks[x, y, z], BlockFace.LEFT);
                                 totalFaces++;
                             }
 
@@ -125,13 +126,13 @@ namespace Hexoidra.World
                             {
                                 if (chunkBlocks[x + 1, y, z].blockType == BlockType.AIR)
                                 {
-                                    GenerateBlockFace(chunkBlocks[x, y, z], Faces.RIGHT);
+                                    GenerateBlockFace(chunkBlocks[x, y, z], BlockFace.RIGHT);
                                     totalFaces++;
                                 }
                             }
                             else
                             {
-                                GenerateBlockFace(chunkBlocks[x, y, z], Faces.RIGHT);
+                                GenerateBlockFace(chunkBlocks[x, y, z], BlockFace.RIGHT);
                                 totalFaces++;
                             }
 
@@ -141,13 +142,13 @@ namespace Hexoidra.World
                             {
                                 if (chunkBlocks[x, y + 1, z].blockType == BlockType.AIR)
                                 {
-                                    GenerateBlockFace(chunkBlocks[x, y, z], Faces.TOP);
+                                    GenerateBlockFace(chunkBlocks[x, y, z], BlockFace.TOP);
                                     totalFaces++;
                                 }
                             }
                             else
                             {
-                                GenerateBlockFace(chunkBlocks[x, y, z], Faces.TOP);
+                                GenerateBlockFace(chunkBlocks[x, y, z], BlockFace.TOP);
                                 totalFaces++;
                             }
                             AddIndiciesForFaces(totalFaces);
@@ -157,13 +158,13 @@ namespace Hexoidra.World
                             {
                                 if (chunkBlocks[x, y - 1, z].blockType == BlockType.AIR)
                                 {
-                                    GenerateBlockFace(chunkBlocks[x, y, z], Faces.BOTTOM);
+                                    GenerateBlockFace(chunkBlocks[x, y, z], BlockFace.BOTTOM);
                                     totalFaces++;
                                 }
                             }
                             else
                             {
-                                GenerateBlockFace(chunkBlocks[x, y, z], Faces.BOTTOM);
+                                GenerateBlockFace(chunkBlocks[x, y, z], BlockFace.BOTTOM);
                                 totalFaces++;
                             }
 
@@ -179,7 +180,7 @@ namespace Hexoidra.World
         /// </summary>
         /// <param name="block">The block to generate the face for</param>
         /// <param name="face">The face to generate on the specified block</param>
-        private void GenerateBlockFace(Block block, Faces face)
+        private void GenerateBlockFace(Block block, BlockFace face)
         {
             FaceData data = block.GetFace(face);
             chunkVerts.AddRange(data.vertices);
@@ -203,16 +204,16 @@ namespace Hexoidra.World
 
         private void BuildChunk()
         {
-            chunkVertexArray = new VertexArrayObject();
-            chunkVertexArray.Bind();
+            chunkVAO = new VertexArrayObject();
+            chunkVAO.Bind();
 
-            chunkVertexBuffer = new VertexBufferObject(chunkVerts);
-            chunkVertexBuffer.Bind();
-            chunkVertexArray.LinkVertexBufferObject(0, 3, chunkVertexBuffer);
+            chunkVBO = new VertexBufferObject(chunkVerts);
+            chunkVBO.Bind();
+            chunkVAO.LinkVertexBufferObject(0, 3, chunkVBO);
 
             chunkUVBuffer = new VertexBufferObject(chunkUVs);
             chunkUVBuffer.Bind();
-            chunkVertexArray.LinkVertexBufferObject(1, 2, chunkUVBuffer);
+            chunkVAO.LinkVertexBufferObject(1, 2, chunkUVBuffer);
 
             chunkIndexBuffer = new IndexBufferObject(chunkIndices);
 
@@ -222,7 +223,7 @@ namespace Hexoidra.World
         internal void Render(Shader shader)
         {
             shader.Bind();
-            chunkVertexArray.Bind();
+            chunkVAO.Bind();
             chunkIndexBuffer.Bind();
             texture.Bind();
 
@@ -230,13 +231,13 @@ namespace Hexoidra.World
 
             texture.Unbind();
             chunkIndexBuffer.Unbind();
-            chunkVertexArray.Unbind();
+            chunkVAO.Unbind();
         }
 
         internal void Dispose()
         {
-            chunkVertexArray.Dispose();
-            chunkVertexBuffer.Dispose();
+            chunkVAO.Dispose();
+            chunkVBO.Dispose();
             chunkUVBuffer.Dispose();
             chunkIndexBuffer.Dispose();
             texture.Dispose();

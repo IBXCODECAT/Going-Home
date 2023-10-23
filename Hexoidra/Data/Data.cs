@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace Hexoidra.World
+namespace Hexoidra.Data
 {
     public enum BlockType
     {
@@ -10,7 +10,7 @@ namespace Hexoidra.World
         STONE
     }
 
-    public enum Faces
+    public enum BlockFace
     {
         FRONT,
         BACK,
@@ -26,46 +26,61 @@ namespace Hexoidra.World
         public List<Vector2> uvs;
     }
 
+    public static class CharacterData
+    {
+        public struct CharacterFaceDataRaw
+        {
+            public static readonly List<Vector3> rawVertexData = new List<Vector3>()
+            {
+                new Vector3(0, 0, 0), //top left
+                new Vector3(1, 0, 0), //top right
+                new Vector3(1, -1, 0), // bottom right
+                new Vector3(0, -1, 0), //bottom left
+            };
+        }
+    }
+    
+
     public struct FaceDataRaw
     {
-        public static readonly Dictionary<Faces, List<Vector3>> rawVertexData = new Dictionary<Faces, List<Vector3>>()
+        public static readonly Dictionary<BlockFace, List<Vector3>> rawVertexData = new Dictionary<BlockFace, List<Vector3>>()
         {
-            {Faces.FRONT, new List<Vector3>()
+            {BlockFace.FRONT, new List<Vector3>()
             {
                 new Vector3(-0.5f, 0.5f, 0.5f), // topleft vert
                 new Vector3(0.5f, 0.5f, 0.5f), // topright vert
                 new Vector3(0.5f, -0.5f, 0.5f), // bottomright vert
                 new Vector3(-0.5f, -0.5f, 0.5f), // bottomleft vert
             } },
-            {Faces.BACK, new List<Vector3>()
+            {BlockFace.BACK, new List<Vector3>()
             {
                 new Vector3(0.5f, 0.5f, -0.5f), // topleft vert
                 new Vector3(-0.5f, 0.5f, -0.5f), // topright vert
                 new Vector3(-0.5f, -0.5f, -0.5f), // bottomright vert
                 new Vector3(0.5f, -0.5f, -0.5f), // bottomleft vert
             } },
-            {Faces.LEFT, new List<Vector3>()
+            {BlockFace.LEFT, new List<Vector3>()
             {
                 new Vector3(-0.5f, 0.5f, -0.5f), // topleft vert
                 new Vector3(-0.5f, 0.5f, 0.5f), // topright vert
                 new Vector3(-0.5f, -0.5f, 0.5f), // bottomright vert
                 new Vector3(-0.5f, -0.5f, -0.5f), // bottomleft vert
             } },
-            {Faces.RIGHT, new List<Vector3>()
+            {BlockFace.RIGHT, new List<Vector3>()
             {
                 new Vector3(0.5f, 0.5f, 0.5f), // topleft vert
                 new Vector3(0.5f, 0.5f, -0.5f), // topright vert
                 new Vector3(0.5f, -0.5f, -0.5f), // bottomright vert
                 new Vector3(0.5f, -0.5f, 0.5f), // bottomleft vert
             } },
-            {Faces.TOP, new List<Vector3>()
+            {BlockFace.TOP, new List<Vector3>()
             {
                 new Vector3(-0.5f, 0.5f, -0.5f), // topleft vert
                 new Vector3(0.5f, 0.5f, -0.5f), // topright vert
                 new Vector3(0.5f, 0.5f, 0.5f), // bottomright vert
                 new Vector3(-0.5f, 0.5f, 0.5f), // bottomleft vert
             } },
-            {Faces.BOTTOM, new List<Vector3>()
+            {BlockFace.BOTTOM, new List<Vector3>()
             {
                 new Vector3(-0.5f, -0.5f, 0.5f), // topleft vert
                 new Vector3(0.5f, -0.5f, 0.5f), // topright vert
