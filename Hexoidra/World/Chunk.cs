@@ -62,7 +62,7 @@ namespace Hexoidra.World
 
         internal static Chunk GetChunkAtPosition(Vector2i position)
         {
-            Console.WriteLine(position);
+            //Console.WriteLine(position);
 
             foreach(Chunk chunk in chunks)
             {

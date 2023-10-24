@@ -13,11 +13,10 @@ namespace Hexoidra.World
         internal static List<Vector2i> activeChunkPositions { get; private set; } = new List<Vector2i> { };
 
         
-
         internal static void BuildChunks()
         {
-            //Store the player's coordinates (position truncated to int) for later use
-            Vector3i playerCoords = Data.playerCoordinates;
+            //Store the player's coordinates (position truncated to chunk coords) for later use
+            Vector3i playerCoords = Data.playerCoordinates / Settings.CHUNK_SIZE;
 
             //Create a list to store positions we want to create our potential new chunks at
             List<Vector2i> potentialChunkPositions = new List<Vector2i>();
@@ -48,6 +47,8 @@ namespace Hexoidra.World
 
                     //Safely dispose of this chunk to prevent a memory leak
                     chunk.Dispose();
+
+                    Console.WriteLine($"Chunk disposed at ({chunkPos.X}, {chunkPos.Y})");
                 }
             }
 
@@ -63,6 +64,8 @@ namespace Hexoidra.World
                     //Construct a new chunk and add it to our list of active chunks to render
                     Chunk chunk = new Chunk(new Chunk.ChunkPositionInfo(chunkPos));
                     activeChunks.Add(chunk);
+
+                    Console.WriteLine($"Chunk constructed at ({chunkPos.X}, {chunkPos.Y})");
                 }
             }
         }
