@@ -1,4 +1,6 @@
-﻿using OpenTK.Graphics.OpenGL4;
+﻿using Hexoidra.Globals;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 
 namespace Hexoidra.Graphics
 {
@@ -59,7 +61,15 @@ namespace Hexoidra.Graphics
         /// <summary>
         /// Binds this Shader
         /// </summary>
-        internal void Bind() { GL.UseProgram(ID); }
+        internal void Bind() { 
+            GL.UseProgram(ID);
+
+            int lightColorLocation = GL.GetUniformLocation(ID, "lightColor");
+            GL.Uniform3(lightColorLocation, Settings.AMBIENT_LIGHTING_COLOR); // Example light color (white)
+
+            int ambientStrengthLocation = GL.GetUniformLocation(ID, "ambientStrength");
+            GL.Uniform1(ambientStrengthLocation, Settings.AMBIENT_LIGHTING_STRENGTH); // Example ambient
+        }
 
         /// <summary>
         /// Unbinds this Shader
