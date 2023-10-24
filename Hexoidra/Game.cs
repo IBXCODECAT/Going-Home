@@ -93,7 +93,7 @@ namespace Hexoidra
             MouseState mouseInput = MouseState;
             KeyboardState keyboardInput = KeyboardState;
 
-            ChunkManager.BuildAll();
+            ChunkManager.BuildChunks();
 
             base.OnUpdateFrame(args);
 

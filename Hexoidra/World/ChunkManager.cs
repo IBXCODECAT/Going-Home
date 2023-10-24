@@ -1,4 +1,4 @@
-﻿using Hexoidra.Data;
+﻿using Hexoidra.Globals;
 using Hexoidra.Graphics;
 using OpenTK.Mathematics;
 
@@ -9,56 +9,68 @@ namespace Hexoidra.World
     /// </summary>
     internal static class ChunkManager
     {
-        internal static List<Chunk> activeChunkCache { get; private set; } = new List<Chunk>() { };
+        internal static List<Chunk> activeChunks { get; private set; } = new List<Chunk>() { };
         internal static List<Vector2i> activeChunkPositions { get; private set; } = new List<Vector2i> { };
 
-        private static List<Vector2i> newChunkCoordsToDraw = new List<Vector2i>();
+        
 
-        internal static void BuildAll()
-        {   
-            newChunkCoordsToDraw.Clear();
+        internal static void BuildChunks()
+        {
+            //Store the player's coordinates (position truncated to int) for later use
+            Vector3i playerCoords = Data.playerCoordinates;
 
-            Vector3i playerCoords = PlayerInfo.playerCoordinates;
+            //Create a list to store positions we want to create our potential new chunks at
+            List<Vector2i> potentialChunkPositions = new List<Vector2i>();
 
-            for(int x = playerCoords.X - PlayerSettings.RENDER_DISTANCE; x < playerCoords.X + PlayerSettings.RENDER_DISTANCE; x++)
+            //Loop through chunk positions on both the X/Z axis ranging from -distance to +distance
+            for(int x = playerCoords.X - Settings.RENDER_DISTANCE; x < playerCoords.X + Settings.RENDER_DISTANCE; x++)
             {
-                for(int z = playerCoords.Z - PlayerSettings.RENDER_DISTANCE; z < playerCoords.Z + PlayerSettings.RENDER_DISTANCE; z++)
+                for(int z = playerCoords.Z - Settings.RENDER_DISTANCE; z < playerCoords.Z + Settings.RENDER_DISTANCE; z++)
                 {
-                    float pointDistance = MathF.Sqrt(MathF.Pow(x - PlayerInfo.playerCoordinates.X, 2) + MathF.Pow(z - PlayerInfo.playerCoordinates.Z, 2));
-
-                    //Console.WriteLine(pointDistance);
-
-                    if (pointDistance < PlayerSettings.RENDER_DISTANCE)
-                    {
+                    //Define a position for a potential new chunk and add it to the list of chunkPositions
                     Vector2i chunkPos = new Vector2i(x, z);
-
-                        newChunkCoordsToDraw.Add(chunkPos);
-                    }
+                    potentialChunkPositions.Add(chunkPos);
                 }
             }
 
-            if (newChunkCoordsToDraw == activeChunkPositions) return;
-
-            foreach (Vector2i c in newChunkCoordsToDraw)
+            //Loop through each chunk position in our list of active chunk positions (currently loaded chunk positions)
+            foreach(Vector2i chunkPos in activeChunkPositions.ToArray())
             {
-                Console.WriteLine($"New chunk: {c.X}, {c.Y}");
+                //If our list of potential chunk positions does not contain an active chunk position...
+                if(!potentialChunkPositions.Contains(chunkPos))
+                {
+                    //Remove the chunk position from the list of active chunks
+                    activeChunkPositions.Remove(chunkPos);
 
-                activeChunkPositions.Clear();
-                activeChunkCache.Clear();
-                
-                activeChunkPositions.Add(c);
-                activeChunkCache.Add(new Chunk(new Chunk.ChunkPositionInfo(c)));
+                    //Get the chunk at this position and remove it form the list of active chunks to render
+                    Chunk chunk = Chunk.GetChunkAtPosition(chunkPos);
+                    activeChunks.Remove(chunk);
+
+                    //Safely dispose of this chunk to prevent a memory leak
+                    chunk.Dispose();
+                }
             }
 
-            newChunkCoordsToDraw.Clear();
+            //Loop through each chunk position in our list of potential chunk positions (chunks expected to be rendered next frame)
+            foreach(Vector2i chunkPos in potentialChunkPositions.ToArray())
+            {
+                //If our list of active chunk positions does not contain a potential chunk position...
+                if (!activeChunkPositions.Contains(chunkPos))
+                {
+                    //Add teh chunk position from the list of active chunks
+                    activeChunkPositions.Add(chunkPos);
 
-            Console.WriteLine(activeChunkCache.Count);
+                    //Construct a new chunk and add it to our list of active chunks to render
+                    Chunk chunk = new Chunk(new Chunk.ChunkPositionInfo(chunkPos));
+                    activeChunks.Add(chunk);
+                }
+            }
         }
 
         internal static void RenderAll(Shader shader)
         {
             
-            foreach(Chunk chunk in activeChunkCache)
+            foreach(Chunk chunk in activeChunks)
             {
                 chunk.Render(shader);
             }
@@ -66,12 +78,12 @@ namespace Hexoidra.World
 
         internal static void DisposeAll()
         {
-            foreach(Chunk chunk in activeChunkCache)
+            foreach(Chunk chunk in activeChunks)
             {
                 chunk.Dispose();
             }
 
-            activeChunkCache.Clear();
+            activeChunks.Clear();
         }
     }
 }

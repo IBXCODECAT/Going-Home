@@ -4,6 +4,8 @@ using OpenTK.Graphics.OpenGL4;
 using SimplexNoise;
 using System.Runtime.CompilerServices;
 
+using Hexoidra.Globals;
+
 namespace Hexoidra.World
 {
     public class Chunk
@@ -20,16 +22,13 @@ namespace Hexoidra.World
             internal ChunkPositionInfo(Vector2i position)
             {
                 this.chunkCoords = position;
-                this.chunkXYOriginInWorldSpace = position * CHUNK_SIZE;
+                this.chunkXYOriginInWorldSpace = position * Globals.Settings.CHUNK_SIZE;
             }
         }
 
         private List<Vector3> chunkVerts;
         private List<Vector2> chunkUVs;
         private List<uint> chunkIndices;
-
-        public const int CHUNK_SIZE = 16;
-        public const int CHUNK_HEIGHT = 64;
 
         internal ChunkPositionInfo position;
 
@@ -41,7 +40,9 @@ namespace Hexoidra.World
         private IndexBufferObject chunkIndexBuffer;
         private Texture texture;
 
-        private Block[,,] chunkBlocks = new Block[CHUNK_SIZE, CHUNK_HEIGHT, CHUNK_SIZE];
+        private static List<Chunk> chunks = new List<Chunk>();
+
+        private Block[,,] chunkBlocks = new Block[Globals.Settings.CHUNK_SIZE, Globals.Settings.CHUNK_HEIGHT, Globals.Settings.CHUNK_SIZE];
         
         internal Chunk(ChunkPositionInfo position)
         {
@@ -55,6 +56,23 @@ namespace Hexoidra.World
 
             ConstructOptimizedMesh();
             BuildChunk();
+
+            chunks.Add(this);
+        }
+
+        internal static Chunk GetChunkAtPosition(Vector2i position)
+        {
+            Console.WriteLine(position);
+
+            foreach(Chunk chunk in chunks)
+            {
+                if(chunk.position.chunkCoords == position)
+                {
+                    return chunk;
+                }
+            }
+
+            throw new Exception("Must call GetChunkAtPosition() at a position that actually contains a chunk.");
         }
 
         /// <summary>
@@ -64,18 +82,18 @@ namespace Hexoidra.World
         /// </summary>
         private void ConstructOptimizedMesh()
         {
-            for(int x = 0; x < CHUNK_SIZE;  x++)
+            for(int x = 0; x < Globals.Settings.CHUNK_SIZE;  x++)
             {
-                for(int z = 0; z < CHUNK_SIZE; z++)
+                for(int z = 0; z < Globals.Settings.CHUNK_SIZE; z++)
                 {
-                    for(int y = 0; y < CHUNK_HEIGHT; y++)
+                    for(int y = 0; y < Globals.Settings.CHUNK_HEIGHT; y++)
                     {
                         int totalFaces = 0;
 
                         if (chunkBlocks[x, y, z].blockType != BlockType.AIR)
                         {
                             //front face - block to front is air or is farthest front in chunk
-                            if (z < CHUNK_SIZE - 1)
+                            if (z < Globals.Settings.CHUNK_SIZE - 1)
                             {
                                 if (chunkBlocks[x, y, z + 1].blockType == BlockType.AIR)
                                 {
@@ -121,7 +139,7 @@ namespace Hexoidra.World
                             }
 
                             //Right faces - block to right is air or is furthest right in chunk
-                            if (x < CHUNK_SIZE - 1)
+                            if (x < Settings.CHUNK_SIZE - 1)
                             {
                                 if (chunkBlocks[x + 1, y, z].blockType == BlockType.AIR)
                                 {
@@ -137,7 +155,7 @@ namespace Hexoidra.World
 
                             //Top faces - block above is empty or is the furthest up in chunk
 
-                            if (y < CHUNK_HEIGHT - 1)
+                            if (y < Settings.CHUNK_HEIGHT - 1)
                             {
                                 if (chunkBlocks[x, y + 1, z].blockType == BlockType.AIR)
                                 {
@@ -228,7 +246,7 @@ namespace Hexoidra.World
 
             GL.DrawElements(PrimitiveType.Triangles, chunkIndices.Count, DrawElementsType.UnsignedInt, 0);
 
-            Console.WriteLine($"Rendering Chunk @ {position.chunkCoords.X}, {position.chunkCoords.Y}");
+            //Console.WriteLine($"Rendering Chunk @ {position.chunkCoords.X}, {position.chunkCoords.Y}");
 
             texture.Unbind();
             chunkIndexBuffer.Unbind();

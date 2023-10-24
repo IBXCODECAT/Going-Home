@@ -1,4 +1,4 @@
-﻿using Hexoidra.Data;
+﻿using Hexoidra.Globals;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -43,8 +43,8 @@ namespace Hexoidra
 
         public Matrix4 GetViewMatrix()
         {
-            PlayerInfo.playerPosition = position;
-            PlayerInfo.playerCoordinates = (Vector3i)position;
+            Data.playerPosition = position;
+            Data.playerCoordinates = (Vector3i)position;
 
             return Matrix4.LookAt(
                 position, //Eye position
