@@ -42,7 +42,7 @@ namespace Hexoidra.Graphics
 
             try
             {
-                using (StreamReader sr = new StreamReader("../../../Shaders/" + filePath))
+                using (StreamReader sr = new StreamReader("./Shaders/" + filePath))
                 {
                     shaderSource = sr.ReadToEnd();
                 }

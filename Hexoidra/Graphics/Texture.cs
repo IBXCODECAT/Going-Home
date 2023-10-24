@@ -26,7 +26,7 @@ namespace Hexoidra.Graphics
 
             //load image
             StbImage.stbi_set_flip_vertically_on_load(1); //StbImage reads in opisisate direction to opengl by default
-            ImageResult texture = ImageResult.FromStream(File.OpenRead($"../../../Textures/{filepath}"), ColorComponents.RedGreenBlueAlpha);
+            ImageResult texture = ImageResult.FromStream(File.OpenRead($"./Textures/{filepath}"), ColorComponents.RedGreenBlueAlpha);
 
             //Give openGL texture data
             GL.TexImage2D(

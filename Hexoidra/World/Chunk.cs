@@ -255,6 +255,8 @@ namespace Hexoidra.World
 
         internal void Dispose()
         {
+            chunks.Remove(this);
+
             chunkVertexArray.Dispose();
             chunkVertexBuffer.Dispose();
             chunkUVBuffer.Dispose();
